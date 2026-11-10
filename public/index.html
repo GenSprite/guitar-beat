@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#11100f">
+<title>Guitar Beat — Rhythm Arcade</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --ink: #11100f;
+    --ink-soft: #1b1917;
+    --paper: #f0e5cd;
+    --paper-dim: #b8ac96;
+    --red: #ef2925;
+    --red-dark: #a91417;
+    --line: rgba(240, 229, 205, .14);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    color: var(--paper);
+    background:
+      radial-gradient(ellipse at 18% 0%, rgba(116, 35, 27, .23), transparent 34rem),
+      radial-gradient(circle, rgba(240, 229, 205, .08) 1px, transparent 1.5px) 0 0 / 9px 9px,
+      var(--ink);
+    font-family: "Segoe UI", Arial, sans-serif;
+  }
+
+  button { font: inherit; }
+
+  .shell { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+
+  .topbar {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    color: var(--paper);
+    background: var(--red);
+    clip-path: polygon(50% 0, 62% 34%, 100% 20%, 76% 52%, 100% 76%, 61% 68%, 50% 100%, 38% 68%, 0 82%, 25% 51%, 0 23%, 39% 34%);
+    font-size: 19px;
+    font-weight: 1000;
+  }
+  .brand-name {
+    font-family: Impact, "Arial Narrow", sans-serif;
+    font-size: 21px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+  }
+  .brand-name span { color: var(--red); }
+  .top-tag {
+    color: var(--paper-dim);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+  }
+
+  .connection {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--paper-dim);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .connection-dot { width: 8px; height: 8px; border-radius: 50%; background: #e6a544; box-shadow: 0 0 10px currentColor; }
+  .connection[data-state="connected"] { color: #b7d99b; border-color: rgba(183, 217, 155, .28); }
+  .connection[data-state="connected"] .connection-dot { background: #8bc56a; }
+  .connection[data-state="disconnected"] { color: #f18a7f; border-color: rgba(241, 138, 127, .3); }
+  .connection[data-state="disconnected"] .connection-dot { background: #ef6257; }
+
+  main { padding: 52px 0 64px; }
+  .intro {
+    position: relative;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+  .eyebrow {
+    margin: 0 0 10px;
+    color: var(--red);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: 0;
+    font-family: Impact, "Arial Narrow", sans-serif;
+    font-size: clamp(42px, 7vw, 72px);
+    font-weight: 900;
+    letter-spacing: -.015em;
+    line-height: .9;
+    text-transform: uppercase;
+    text-shadow: 3px 3px 0 var(--red-dark);
+  }
+  h1 span { color: var(--red); }
+  .intro-copy {
+    max-width: 270px;
+    margin: 0 0 3px;
+    color: var(--paper-dim);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .arcade {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 292px;
+    align-items: start;
+    gap: 20px;
+  }
+  .cabinet {
+    position: relative;
+    overflow: hidden;
+    padding: 18px;
+    border: 1px solid rgba(240, 229, 205, .22);
+    border-radius: 5px;
+    background:
+      linear-gradient(135deg, rgba(239, 41, 37, .1), transparent 35%),
+      #181614;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .35), inset 0 0 0 5px rgba(0, 0, 0, .18);
+  }
+  .cabinet::before, .cabinet::after {
+    position: absolute;
+    z-index: 0;
+    width: 100px;
+    height: 100px;
+    border: 1px solid rgba(239, 41, 37, .35);
+    content: "";
+    transform: rotate(45deg);
+    pointer-events: none;
+  }
+  .cabinet::before { top: -68px; left: -68px; }
+  .cabinet::after { right: -72px; bottom: -72px; }
+  .cabinet-head, .screen-wrap { position: relative; z-index: 1; }
+  .cabinet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 auto 13px;
+    max-width: 400px;
+  }
+  .track-label { color: var(--paper-dim); font-size: 10px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+  .track-label strong { display: block; margin-top: 4px; color: var(--paper); font-size: 13px; letter-spacing: .08em; }
+  .playing {
+    padding: 6px 9px;
+    border: 1px solid rgba(239, 41, 37, .4);
+    color: #ff7770;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .playing::before { display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--red); content: ""; vertical-align: 1px; }
+  .screen-wrap {
+    width: min(100%, 400px);
+    margin: 0 auto;
+    border: 1px solid rgba(240, 229, 205, .25);
+    background: #0b0a09;
+    box-shadow: 0 0 0 5px rgba(0, 0, 0, .25), 0 0 35px rgba(239, 41, 37, .08);
+  }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; }
+  .song-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    width: min(100%, 400px);
+    margin: 15px auto 0;
+    padding: 10px;
+    border: 1px solid rgba(240, 229, 205, .12);
+    background: rgba(0, 0, 0, .2);
+  }
+  .song-file,
+  .song-chart,
+  .song-bpm {
+    color: #9c9385;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .song-file { min-width: 0; }
+  .song-chart { grid-column: 1 / -1; }
+  .song-file input {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    color: var(--paper-dim);
+    font-size: 10px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .song-chart input {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    color: var(--paper-dim);
+    font-size: 10px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .song-bpm input {
+    width: 58px;
+    margin-top: 5px;
+    padding: 5px 4px;
+    border: 1px solid rgba(240, 229, 205, .25);
+    border-radius: 2px;
+    color: var(--paper);
+    background: #26221e;
+    font: inherit;
+    font-size: 11px;
+    letter-spacing: 0;
+  }
+  .song-toggle {
+    grid-column: 1 / -1;
+    min-height: 30px;
+    border: 1px solid rgba(239, 41, 37, .55);
+    border-radius: 2px;
+    color: var(--paper);
+    background: rgba(239, 41, 37, .12);
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .song-toggle:hover:not(:disabled),
+  .song-toggle:focus-visible:not(:disabled) { background: rgba(239, 41, 37, .28); }
+  .song-toggle:disabled { cursor: not-allowed; opacity: .45; }
+  .song-name {
+    grid-column: 1 / -1;
+    overflow: hidden;
+    color: #766e62;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .difficulty-modal {
+    position: fixed;
+    z-index: 10;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(8, 7, 6, .86);
+    backdrop-filter: blur(5px);
+  }
+  .difficulty-modal[hidden] { display: none; }
+  .difficulty-card {
+    width: min(100%, 520px);
+    padding: 25px;
+    border: 1px solid rgba(240, 229, 205, .28);
+    border-top: 3px solid var(--red);
+    background: linear-gradient(145deg, rgba(239, 41, 37, .12), transparent 55%), #181614;
+    box-shadow: 0 20px 70px rgba(0, 0, 0, .6);
+  }
+  .difficulty-kicker {
+    margin: 0 0 8px;
+    color: var(--red);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+  }
+  .difficulty-card h2 {
+    margin: 0;
+    color: var(--paper);
+    font-family: Impact, "Arial Narrow", sans-serif;
+    font-size: 34px;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+  }
+  .difficulty-copy {
+    margin: 9px 0 20px;
+    color: var(--paper-dim);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .difficulty-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .difficulty-option {
+    min-height: 78px;
+    padding: 10px 8px;
+    border: 1px solid rgba(240, 229, 205, .22);
+    border-radius: 2px;
+    color: var(--paper);
+    background: #26221e;
+    cursor: pointer;
+    text-align: left;
+  }
+  .difficulty-option:hover,
+  .difficulty-option:focus-visible { border-color: var(--red); background: rgba(239, 41, 37, .18); outline: none; }
+  .difficulty-option strong { display: block; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+  .difficulty-option span { display: block; margin-top: 7px; color: #9c9385; font-size: 10px; line-height: 1.35; }
+  .cabinet-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 400px;
+    margin: 17px auto 0;
+    color: #8f8779;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+  }
+  .cabinet-foot strong { color: var(--paper-dim); }
+
+  .side-panel { display: grid; gap: 14px; }
+  .panel {
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: linear-gradient(145deg, rgba(255,255,255,.035), transparent 60%), var(--ink-soft);
+  }
+  .panel-title {
+    margin: 0 0 15px;
+    color: var(--paper-dim);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+  }
+  .score-label { color: var(--paper-dim); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .score-value {
+    margin: 5px 0 15px;
+    color: var(--paper);
+    font-family: Impact, "Arial Narrow", sans-serif;
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: .04em;
+  }
+  .score-value small { color: var(--red); font-family: "Segoe UI", Arial, sans-serif; font-size: 12px; font-weight: 900; letter-spacing: .12em; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .mini-stat { min-width: 0; padding: 10px 8px; border: 1px solid var(--line); background: rgba(0, 0, 0, .18); }
+  .mini-stat span { display: block; color: #9c9385; font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .mini-stat strong { display: block; margin-top: 5px; color: var(--paper); font-size: 19px; font-weight: 800; }
+  .mini-stat strong em { color: var(--red); font-size: 11px; font-style: normal; }
+  .progress-head { display: flex; justify-content: space-between; gap: 10px; margin: 17px 0 8px; color: #9c9385; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .progress-track { height: 5px; overflow: hidden; background: #37312b; }
+  .progress-fill { width: 0; height: 100%; background: linear-gradient(90deg, var(--red-dark), var(--red)); transition: width .2s ease; }
+
+  .feedback {
+    display: flex;
+    min-height: 57px;
+    align-items: center;
+    gap: 11px;
+    padding: 12px;
+    border-left: 3px solid var(--red);
+    background: rgba(239, 41, 37, .08);
+  }
+  .feedback-icon { color: var(--red); font-size: 21px; font-weight: 900; }
+  .feedback-copy { color: var(--paper-dim); font-size: 11px; line-height: 1.45; }
+  .feedback-copy strong { display: block; color: var(--paper); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  .feedback[data-kind="good"] { border-color: #9fca76; background: rgba(159, 202, 118, .08); }
+  .feedback[data-kind="good"] .feedback-icon { color: #acd585; }
+  .feedback[data-kind="miss"] { border-color: #f07867; }
+
+  .controls-list { display: grid; gap: 12px; }
+  .control-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .control-item > span { color: var(--paper-dim); font-size: 11px; }
+  .key-group { display: flex; gap: 4px; }
+  kbd {
+    display: grid;
+    width: 25px;
+    height: 25px;
+    place-items: center;
+    border: 1px solid rgba(240, 229, 205, .28);
+    border-bottom-width: 3px;
+    border-radius: 3px;
+    color: var(--paper);
+    background: #26221e;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 900;
+  }
+  .controller-note { margin: 15px 0 0; padding-top: 12px; border-top: 1px solid var(--line); color: #8f8779; font-size: 10px; line-height: 1.6; }
+  .controller-note strong { color: var(--paper-dim); }
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 26px;
+    color: #766e62;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 760px) {
+    .shell { width: min(100% - 28px, 560px); }
+    main { padding-top: 34px; }
+    .intro { align-items: start; flex-direction: column; gap: 13px; }
+    .intro-copy { max-width: 360px; }
+    .arcade { grid-template-columns: 1fr; }
+    .side-panel { grid-template-columns: 1fr 1fr; }
+    .side-panel .panel:first-child { grid-column: 1 / -1; }
+  }
+  @media (max-width: 460px) {
+    .shell { width: calc(100% - 22px); }
+    .topbar { min-height: 65px; }
+    .top-tag { display: none; }
+    .connection { max-width: 170px; padding: 0 9px; font-size: 9px; }
+    .cabinet { padding: 12px 9px; }
+    .cabinet-foot { padding: 0 5px; font-size: 8px; }
+    .side-panel { grid-template-columns: 1fr; }
+    .side-panel .panel:first-child { grid-column: auto; }
+    .footer { flex-direction: column; gap: 7px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">!</div>
+      <div class="brand-name">Guitar <span>Beat</span></div>
+    </div>
+    <div class="top-tag">ESP32 · Rhythm arcade</div>
+    <div class="connection" id="status" data-state="connecting" role="status" aria-live="polite">
+      <span class="connection-dot" aria-hidden="true"></span>
+      <span id="status-text">Connecting to game server</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Turn it up. Lock it in.</p>
+        <h1 id="page-title">Hit the <span>beat.</span></h1>
+      </div>
+      <p class="intro-copy">A four-fret rhythm run: follow the colored notes down the highway, hit the matching button on the beat, and hold long notes to the end.</p>
+    </section>
+
+    <section class="arcade" aria-label="Rhythm game">
+      <div class="cabinet">
+        <div class="cabinet-head">
+          <div class="track-label">Now playing<strong>Electric riff / Track 01</strong></div>
+          <div class="playing">Live session</div>
+        </div>
+        <div class="screen-wrap">
+          <canvas id="c" width="400" height="600" aria-label="Rhythm game playfield"></canvas>
+        </div>
+        <div class="song-controls" aria-label="Song player">
+          <label class="song-file">Load a song
+            <input id="song-file" type="file" accept="audio/*">
+          </label>
+          <label class="song-bpm">BPM
+            <input id="song-bpm" type="number" min="40" max="240" value="63" inputmode="numeric">
+          </label>
+          <label class="song-chart">Load guitar chart or MIDI
+            <input id="song-chart" type="file" accept=".json,.mid,.midi,application/json,audio/midi,audio/mid">
+          </label>
+          <button class="song-toggle" id="song-toggle" type="button" disabled>Choose song + guitar chart</button>
+          <span class="song-name" id="song-name">No song loaded</span>
+          <span class="song-name" id="chart-name">No guitar chart loaded · exact sync is required</span>
+        </div>
+        <div class="cabinet-foot"><span>Match the fret. <strong>Hit the beat.</strong></span><span>48 patterns · 4 frets</span></div>
+      </div>
+
+      <aside class="side-panel">
+        <section class="panel" aria-label="Round score">
+          <h2 class="panel-title">Your run</h2>
+          <div class="score-label">Total score</div>
+          <div class="score-value"><span id="score">0</span> <small>PTS</small></div>
+          <div class="stat-row">
+          <div class="mini-stat"><span>Streak</span><strong><span id="combo">0</span></strong></div>
+          <div class="mini-stat"><span>Multiplier</span><strong id="multiplier">1×</strong></div>
+          <div class="mini-stat"><span>Accuracy</span><strong id="accuracy">—</strong></div>
+          </div>
+          <div class="progress-head"><span>Track progress</span><span id="progress-label">0 / 48</span></div>
+          <div class="progress-track" role="progressbar" aria-label="Track progress" aria-valuemin="0" aria-valuemax="48" aria-valuenow="0">
+            <div class="progress-fill" id="progress"></div>
+          </div>
+        </section>
+
+        <div class="feedback" id="feedback" data-kind="ready" aria-live="polite">
+          <div class="feedback-icon" aria-hidden="true">♪</div>
+          <div class="feedback-copy"><strong id="feedback-title">Get ready</strong><span id="feedback-copy">First notes are on their way.</span></div>
+        </div>
+
+        <section class="panel">
+          <h2 class="panel-title">Your controls</h2>
+          <div class="controls-list">
+            <div class="control-item"><span>Fret + strum</span><div class="key-group" aria-label="D F J K keys"><kbd>D</kbd><kbd>F</kbd><kbd>J</kbd><kbd>K</kbd></div></div>
+            <div class="control-item"><span>Difficulty</span><strong id="difficulty-label" style="color:var(--paper);font-size:11px">Choose at start</strong></div>
+            <div class="control-item"><span>Controller</span><strong style="color:var(--paper);font-size:11px">ESP32 ready</strong></div>
+          </div>
+          <p class="controller-note"><strong>Fret + strum:</strong> press the matching key as its gem reaches the line. <strong>Double / triple:</strong> strum repeatedly. <strong>Hold:</strong> keep the button down to the end of the tail. <strong>Chord:</strong> press all four together.</p>
+        </section>
+      </aside>
+    </section>
+
+    <footer class="footer"><span>Guitar Beat — Find your rhythm</span><span>Made for the ones who play loud</span></footer>
+  </main>
+</div>
+<div class="difficulty-modal" id="difficulty-modal" role="dialog" aria-modal="true" aria-labelledby="difficulty-title">
+  <div class="difficulty-card">
+    <p class="difficulty-kicker">Choose your run</p>
+    <h2 id="difficulty-title">How many lanes?</h2>
+    <p class="difficulty-copy">Pick a difficulty before playing. Easier modes simplify chords and remove notes from the higher lanes while keeping the song timing intact.</p>
+    <div class="difficulty-options">
+      <button class="difficulty-option" type="button" data-lanes="2"><strong>Easy</strong><span>2 lanes · D / F</span></button>
+      <button class="difficulty-option" type="button" data-lanes="3"><strong>Medium</strong><span>3 lanes · D / F / J</span></button>
+      <button class="difficulty-option" type="button" data-lanes="4"><strong>Hard</strong><span>4 lanes · D / F / J / K</span></button>
+    </div>
+  </div>
+</div>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+// Faster highway scroll, similar to a Clone Hero-style note speed. This only
+// changes the visual travel rate; hit timing still follows the song clock.
+const HIT_Y = 520, SPEED = 540;
+const colors = ['#75d66f', '#ef4545', '#f4d34e', '#53b8ef'];
+const PERFECT = 0.05, GOOD = 0.15;
+const HIT_EFFECT_DURATION = 300;
+const MULTI_GAP = 0.22, CHORD_SPREAD = 0.16, HOLD_DURATION = 0.75;
+let score = 0, combo = 0, maxCombo = 0, msg = '', finished = false;
+const stats = { perfect: 0, good: 0, miss: 0, reactions: [] };
+const LEAD_IN = 2;
+let chartBpm = 63;
+let t0 = performance.now();
+let activeLaneCount = 4;
+let difficultySelected = false;
+
+const pattern = ['tap', 'double', 'tap', 'triple', 'hold', 'tap', 'chord', 'tap'];
+const laneSequence = [0, 1, 2, 3, 2, 0, 1, 3, 1, 2, 0, 3, 0, 2, 3, 1];
+function createDefaultNotes() {
+  return Array.from({ length: 48 }, (_, i) => {
+    const kind = pattern[i % pattern.length];
+    return {
+      kind,
+      lane: laneSequence[i % laneSequence.length],
+      lanes: kind === 'chord' ? [0, 1, 2, 3] : null,
+      time: LEAD_IN + i * (60 / chartBpm),
+      count: kind === 'double' ? 2 : kind === 'triple' ? 3 : 1,
+      gap: kind === 'double' || kind === 'triple' ? MULTI_GAP : 0,
+      progress: 0,
+      hitDiffs: [],
+      duration: kind === 'hold' ? HOLD_DURATION : 0,
+      started: false,
+      startedAt: 0,
+      startDiff: 0,
+      done: false
+    };
+  });
+}
+let sourceNotes = createDefaultNotes();
+let notes = sourceNotes;
+
+const status = document.getElementById('status');
+const statusText = document.getElementById('status-text');
+const feedback = document.getElementById('feedback');
+const songFile = document.getElementById('song-file');
+const songBpm = document.getElementById('song-bpm');
+const songToggle = document.getElementById('song-toggle');
+const songName = document.getElementById('song-name');
+const chartFile = document.getElementById('song-chart');
+const chartName = document.getElementById('chart-name');
+const difficultyModal = document.getElementById('difficulty-modal');
+const difficultyOptions = document.querySelectorAll('.difficulty-option');
+const difficultyLabel = document.getElementById('difficulty-label');
+const songAudio = new Audio();
+songAudio.preload = 'auto';
+let songMode = false;
+let songObjectUrl = null;
+let chartLoaded = false;
+const keyNames = ['D', 'F', 'J', 'K'];
+const held = [false, false, false, false];
+const downAt = [null, null, null, null];
+const hitEffects = [];
+
+function gameTime() {
+  if (!difficultySelected) return 0;
+  // Exact charts wait at time zero until both their audio and chart are ready.
+  // The original built-in practice chart keeps its normal wall-clock mode.
+  if (songMode && chartLoaded) return songAudio.currentTime;
+  if (songMode || chartLoaded) return 0;
+  return (performance.now() - t0) / 1000;
+}
+
+function laneWidth() {
+  return 400 / activeLaneCount;
+}
+
+function cloneNote(note) {
+  return {
+    ...note,
+    lanes: note.lanes ? [...note.lanes] : null,
+    hitDiffs: [],
+    progress: 0,
+    started: false,
+    startedAt: 0,
+    startDiff: 0,
+    done: false
+  };
+}
+
+function applyDifficulty() {
+  const maxLane = activeLaneCount - 1;
+  const filtered = [];
+  for (const sourceNote of sourceNotes) {
+    const availableLanes = noteLanes(sourceNote).filter(lane => lane <= maxLane);
+    if (!availableLanes.length) continue;
+    if (sourceNote.kind === 'chord') {
+      if (availableLanes.length > 1) {
+        filtered.push(cloneNote({ ...sourceNote, lane: availableLanes[0], lanes: availableLanes }));
+      } else {
+        filtered.push(cloneNote({ ...sourceNote, kind: 'tap', lane: availableLanes[0], lanes: null, duration: 0 }));
+      }
+    } else {
+      filtered.push(cloneNote(sourceNote));
+    }
+  }
+  notes = filtered;
+}
+
+function noteLanes(note) {
+  return note.kind === 'chord' ? (note.lanes || [0, 1, 2, 3]) : [note.lane];
+}
+
+function normalizeChartNote(raw, index) {
+  const kinds = ['tap', 'double', 'triple', 'hold', 'chord'];
+  const kind = raw && kinds.includes(raw.kind) ? raw.kind : null;
+  const time = Number(raw && raw.time);
+  if (!kind || !Number.isFinite(time) || time < 0) {
+    throw new Error(`Invalid note ${index + 1}: kind and non-negative time are required.`);
+  }
+
+  const lanes = kind === 'chord'
+    ? (Array.isArray(raw.lanes) ? raw.lanes : [0, 1, 2, 3])
+        .map(Number)
+        .filter(lane => Number.isInteger(lane) && lane >= 0 && lane < 4)
+    : null;
+  if (kind === 'chord' && (lanes.length < 2 || new Set(lanes).size !== lanes.length)) {
+    throw new Error(`Invalid chord ${index + 1}: lanes must contain unique values from 0 to 3.`);
+  }
+
+  const lane = Number(raw.lane ?? (lanes ? lanes[0] : 0));
+  if (!Number.isInteger(lane) || lane < 0 || lane > 3) {
+    throw new Error(`Invalid note ${index + 1}: lane must be between 0 and 3.`);
+  }
+
+  const count = kind === 'double' ? 2 : kind === 'triple' ? 3 : 1;
+  const gap = kind === 'double' || kind === 'triple' ? Number(raw.gap ?? MULTI_GAP) : 0;
+  const duration = kind === 'hold' ? Number(raw.duration) : 0;
+  if ((kind === 'double' || kind === 'triple') && (!Number.isFinite(gap) || gap <= 0)) {
+    throw new Error(`Invalid repeat ${index + 1}: gap must be greater than zero.`);
+  }
+  if (kind === 'hold' && (!Number.isFinite(duration) || duration <= 0)) {
+    throw new Error(`Invalid hold ${index + 1}: duration must be greater than zero.`);
+  }
+
+  return {
+    kind,
+    lane,
+    lanes,
+    time,
+    count,
+    gap,
+    progress: 0,
+    hitDiffs: [],
+    duration,
+    started: false,
+    startedAt: 0,
+    startDiff: 0,
+    done: false
+  };
+}
+
+function midiVariableLength(data, state) {
+  let value = 0;
+  let byte;
+  do {
+    if (state.offset >= data.length) throw new Error('Unexpected end of MIDI data.');
+    byte = data[state.offset++];
+    value = (value << 7) | (byte & 0x7f);
+  } while (byte & 0x80);
+  return value;
+}
+
+function midiToChart(buffer, title) {
+  const data = new Uint8Array(buffer);
+  const state = { offset: 0 };
+  const text = (start, length) => String.fromCharCode(...data.slice(start, start + length));
+  const u16 = () => {
+    const value = (data[state.offset] << 8) | data[state.offset + 1];
+    state.offset += 2;
+    return value;
+  };
+  const u32 = () => {
+    const value = (data[state.offset] * 0x1000000) + (data[state.offset + 1] << 16) + (data[state.offset + 2] << 8) + data[state.offset + 3];
+    state.offset += 4;
+    return value;
+  };
+
+  if (text(0, 4) !== 'MThd') throw new Error('This is not a valid MIDI file.');
+  state.offset = 8;
+  const format = u16();
+  const trackCount = u16();
+  const division = u16();
+  if (division & 0x8000) throw new Error('SMPTE-timed MIDI files are not supported.');
+  if (format > 2) throw new Error('Unsupported MIDI format.');
+
+  const events = [];
+  const tempos = [];
+  for (let trackIndex = 0; trackIndex < trackCount; trackIndex++) {
+    if (text(state.offset, 4) !== 'MTrk') throw new Error('Invalid MIDI track data.');
+    state.offset += 4;
+    const trackLength = u32();
+    const trackEnd = state.offset + trackLength;
+    let tick = 0;
+    let runningStatus = 0;
+    const active = new Map();
+
+    while (state.offset < trackEnd) {
+      tick += midiVariableLength(data, state);
+      let status = data[state.offset++];
+      if (status < 0x80) {
+        state.offset--;
+        status = runningStatus;
+      } else if (status < 0xf0) {
+        runningStatus = status;
+      }
+
+      if (status === 0xff) {
+        const metaType = data[state.offset++];
+        const length = midiVariableLength(data, state);
+        if (metaType === 0x51 && length === 3) {
+          tempos.push({ tick, microsecondsPerBeat: (data[state.offset] << 16) | (data[state.offset + 1] << 8) | data[state.offset + 2] });
+        }
+        state.offset += length;
+        continue;
+      }
+      if (status === 0xf0 || status === 0xf7) {
+        state.offset += midiVariableLength(data, state);
+        continue;
+      }
+
+      const type = status & 0xf0;
+      const channel = status & 0x0f;
+      if (type === 0x90 || type === 0x80) {
+        const pitch = data[state.offset++];
+        const velocity = data[state.offset++];
+        const key = `${channel}:${pitch}`;
+        if (type === 0x90 && velocity > 0) {
+          if (!active.has(key)) active.set(key, []);
+          active.get(key).push({ tick, pitch, velocity, channel, trackIndex });
+        } else if (active.has(key)) {
+          const pending = active.get(key).pop();
+          if (pending) events.push({ ...pending, endTick: tick });
+        }
+      } else if (type === 0xc0 || type === 0xd0) {
+        state.offset += 1;
+      } else {
+        state.offset += 2;
+      }
+    }
+    state.offset = trackEnd;
+  }
+
+  if (!events.length) throw new Error('The MIDI file contains no playable note events.');
+  const tempoEvents = tempos.sort((a, b) => a.tick - b.tick);
+  const defaultTempo = tempoEvents[0]?.microsecondsPerBeat || 500000;
+  const tempoAtZero = tempoEvents.find(event => event.tick === 0)?.microsecondsPerBeat || defaultTempo;
+  const tempoMap = [{ tick: 0, microsecondsPerBeat: tempoAtZero }];
+  for (const event of tempoEvents) {
+    if (event.tick > 0 && event.microsecondsPerBeat !== tempoMap.at(-1).microsecondsPerBeat) tempoMap.push(event);
+  }
+  function tickToSeconds(targetTick) {
+    let seconds = 0;
+    let previousTick = 0;
+    let microsecondsPerBeat = tempoMap[0].microsecondsPerBeat;
+    for (const tempo of tempoMap.slice(1)) {
+      if (tempo.tick > targetTick) break;
+      seconds += (tempo.tick - previousTick) * microsecondsPerBeat / division / 1000000;
+      previousTick = tempo.tick;
+      microsecondsPerBeat = tempo.microsecondsPerBeat;
+    }
+    return seconds + (targetTick - previousTick) * microsecondsPerBeat / division / 1000000;
+  }
+
+  const pitchCounts = new Map();
+  for (const event of events) pitchCounts.set(event.pitch, (pitchCounts.get(event.pitch) || 0) + 1);
+  const pitchLevels = [...pitchCounts.keys()].sort((a, b) => a - b);
+  const pitchBoundaries = [];
+  const quarterTargets = [events.length * .25, events.length * .5, events.length * .75];
+  let cumulativePitchCount = 0;
+  let targetIndex = 0;
+  for (let i = 0; i < pitchLevels.length - 1 && targetIndex < quarterTargets.length; i++) {
+    cumulativePitchCount += pitchCounts.get(pitchLevels[i]);
+    while (targetIndex < quarterTargets.length && cumulativePitchCount >= quarterTargets[targetIndex]) {
+      pitchBoundaries.push((pitchLevels[i] + pitchLevels[i + 1]) / 2);
+      targetIndex++;
+    }
+  }
+  // Use the song's pitch distribution instead of fixed octave ranges. This
+  // prevents a narrow or skewed melody from leaving one lane unused.
+  const pitchLane = pitch => {
+    let lane = 0;
+    while (lane < pitchBoundaries.length && pitch > pitchBoundaries[lane]) lane++;
+    return Math.max(0, Math.min(3, lane));
+  };
+  const timedEvents = events
+    .map(event => ({
+      tick: event.tick,
+      start: tickToSeconds(event.tick),
+      duration: Math.max(0.05, tickToSeconds(event.endTick) - tickToSeconds(event.tick)),
+      lane: pitchLane(event.pitch),
+      velocity: event.velocity
+    }))
+    .sort((a, b) => a.start - b.start);
+
+  const output = [];
+  let group = [];
+  function flushGroup() {
+    if (!group.length) return;
+    const byLane = new Map();
+    for (const event of group) {
+      const existing = byLane.get(event.lane);
+      if (!existing || event.velocity > existing.velocity) byLane.set(event.lane, event);
+    }
+    const lanes = [...byLane.keys()].sort((a, b) => a - b);
+    const start = group[0].start;
+    if (lanes.length === 1) {
+      const event = byLane.get(lanes[0]);
+      output.push(event.duration >= 0.45
+        ? { time: start, kind: 'hold', lane: lanes[0], duration: event.duration }
+        : { time: start, kind: 'tap', lane: lanes[0] });
+    } else if (lanes.length > 1) {
+      output.push({ time: start, kind: 'chord', lanes });
+    }
+    group = [];
+  }
+  for (const event of timedEvents) {
+    if (group.length && event.start - group[0].start > 0.035) flushGroup();
+    group.push(event);
+  }
+  flushGroup();
+
+  // Refine dense MIDI output after pitch-mapping it to four lanes. This keeps
+  // the chart readable by preventing same-lane gems and sustain tails from
+  // overlapping while preserving the strongest event in each close group.
+  const MIN_LANE_GAP = 0.18;
+  const MIN_HOLD_LENGTH = 0.18;
+  const lastOnLane = [null, null, null, null];
+  const compacted = [];
+  for (const sourceNote of output) {
+    const sourceLanes = sourceNote.kind === 'chord' ? sourceNote.lanes : [sourceNote.lane];
+    const availableLanes = [];
+    for (const lane of sourceLanes) {
+      const previous = lastOnLane[lane];
+      if (!previous || sourceNote.time - (previous.time + (previous.kind === 'hold' ? previous.duration : 0)) >= MIN_LANE_GAP) {
+        availableLanes.push(lane);
+        continue;
+      }
+      if (previous.kind === 'hold') {
+        const shortened = sourceNote.time - previous.time - MIN_LANE_GAP;
+        if (shortened >= MIN_HOLD_LENGTH) {
+          previous.duration = shortened;
+          availableLanes.push(lane);
+        }
+      }
+    }
+    if (!availableLanes.length) continue;
+
+    const note = sourceNote.kind === 'chord'
+      ? (availableLanes.length > 1
+        ? { ...sourceNote, lanes: availableLanes }
+        : { time: sourceNote.time, kind: 'tap', lane: availableLanes[0] })
+      : sourceNote;
+    compacted.push(note);
+    for (const lane of availableLanes) lastOnLane[lane] = note;
+  }
+
+  const MIN_EVENT_GAP = 0.18;
+  const spaced = [];
+  for (const note of compacted) {
+    const previous = spaced.at(-1);
+    if (!previous || note.time - previous.time >= MIN_EVENT_GAP) {
+      spaced.push(note);
+    } else if (previous.kind === 'hold' && note.time > previous.time + MIN_HOLD_LENGTH) {
+      previous.duration = Math.max(MIN_HOLD_LENGTH, note.time - previous.time - MIN_EVENT_GAP);
+    }
+  }
+
+  return {
+    title,
+    bpm: Math.round(60000000 / tempoAtZero),
+    source: 'MIDI pitch-mapped chart',
+    notes: spaced
+  };
+}
+
+function loadChart(data) {
+  if (!data || !Array.isArray(data.notes) || !data.notes.length) {
+    throw new Error('The chart must contain a non-empty notes array.');
+  }
+  const loadedNotes = data.notes
+    .map(normalizeChartNote)
+    .sort((a, b) => a.time - b.time);
+  sourceNotes = loadedNotes;
+  if (difficultySelected) applyDifficulty();
+  else notes = sourceNotes;
+  chartLoaded = true;
+  const metadataBpm = Number(data.bpm);
+  if (Number.isFinite(metadataBpm) && metadataBpm >= 40 && metadataBpm <= 240) {
+    chartBpm = Math.round(metadataBpm);
+    songBpm.value = chartBpm;
+  }
+  songBpm.disabled = true;
+}
+
+function createHitBurst(lanes, perfect, intensity = 1) {
+  const now = performance.now();
+  for (const lane of lanes) {
+    const color = colors[lane];
+    const x = lane * laneWidth() + laneWidth() / 2;
+    const particles = Array.from({ length: Math.round(14 * intensity) }, () => {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (95 + Math.random() * 190) * intensity;
+      return {
+        x,
+        y: HIT_Y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 2 + Math.random() * 4,
+        color: Math.random() < .25 ? '#fff' : color
+      };
+    });
+    hitEffects.push({ x, y: HIT_Y, color, perfect, startedAt: now, particles });
+  }
+}
+
+function drawHitEffects(now) {
+  for (let i = hitEffects.length - 1; i >= 0; i--) {
+    const effect = hitEffects[i];
+    const elapsed = (now - effect.startedAt) / HIT_EFFECT_DURATION;
+    if (elapsed >= 1) {
+      hitEffects.splice(i, 1);
+      continue;
+    }
+
+    // Ease the burst outward so a successful gem feels like it pops on impact.
+    const progress = 1 - Math.pow(1 - elapsed, 3);
+    const alpha = Math.pow(1 - elapsed, 1.15);
+    const radius = 10 + progress * 54;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = effect.perfect ? '#fff' : effect.color;
+    ctx.lineWidth = effect.perfect ? 5 * alpha : 4 * alpha;
+    ctx.shadowColor = effect.color;
+    ctx.shadowBlur = 24 * alpha;
+    ctx.beginPath();
+    ctx.arc(effect.x, effect.y, radius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // A bright core makes the note read as an actual explosion, even on a
+    // small screen or when the button is hit exactly on the strike line.
+    ctx.fillStyle = effect.perfect ? '#fff' : effect.color;
+    ctx.globalAlpha = alpha * .75;
+    ctx.beginPath();
+    ctx.arc(effect.x, effect.y, Math.max(0, 18 * (1 - elapsed)), 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalAlpha = alpha;
+    for (const particle of effect.particles) {
+      const seconds = elapsed * .55;
+      const px = particle.x + particle.vx * seconds;
+      const py = particle.y + particle.vy * seconds + 90 * seconds * seconds;
+      const size = particle.size * (1 - elapsed * .35);
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(Math.atan2(particle.vy, particle.vx) + elapsed * 3);
+      ctx.fillStyle = particle.color;
+      ctx.shadowColor = particle.color;
+      ctx.shadowBlur = 8 * alpha;
+      ctx.fillRect(-size / 2, -size / 2, size, size * .7);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+}
+
+function drawHoldShine(x, width, noteY, noteHeight, note, now) {
+  if (!note.started || !held[note.lane] || noteHeight <= 0) return;
+
+  const pulse = .5 + Math.sin(now * 9) * .5;
+  const travel = ((now - note.startedAt) * SPEED) % noteHeight;
+  const bandHeight = Math.min(16, noteHeight);
+  const bandY = noteY + Math.min(
+    Math.max(0, travel - bandHeight / 2),
+    Math.max(0, noteHeight - bandHeight)
+  );
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+
+  // Keep the held tail softly illuminated while the player maintains the
+  // button, then send a brighter glint along it for a sense of movement.
+  ctx.globalAlpha = .18 + pulse * .2;
+  ctx.fillStyle = '#fff';
+  ctx.shadowColor = '#fff';
+  ctx.shadowBlur = 14 + pulse * 10;
+  ctx.fillRect(x + 10, noteY, width - 20, noteHeight);
+
+  const shine = ctx.createLinearGradient(0, bandY, 0, bandY + bandHeight);
+  shine.addColorStop(0, 'rgba(255,255,255,0)');
+  shine.addColorStop(.5, 'rgba(255,255,255,.95)');
+  shine.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.globalAlpha = .8;
+  ctx.fillStyle = shine;
+  ctx.fillRect(x + 4, bandY, width - 8, bandHeight);
+
+  ctx.globalAlpha = .2 + pulse * .18;
+  ctx.lineWidth = 2 + pulse;
+  ctx.strokeStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(x + width / 2, HIT_Y, 15 + pulse * 4, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function updateStats() {
+  const completed = stats.perfect + stats.good + stats.miss;
+  const hits = stats.perfect + stats.good;
+  const accuracy = completed ? Math.round(hits / completed * 100) : null;
+  const progress = Math.round(completed / notes.length * 100);
+  const multiplier = Math.min(4, 1 + Math.floor(combo / 10));
+  document.getElementById('score').textContent = score.toLocaleString();
+  document.getElementById('combo').textContent = combo;
+  document.getElementById('multiplier').textContent = `${multiplier}×`;
+  document.getElementById('accuracy').textContent = accuracy === null ? '—' : `${accuracy}%`;
+  document.getElementById('progress-label').textContent = `${completed} / ${notes.length}`;
+  document.getElementById('progress').style.width = `${progress}%`;
+  document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', completed);
+  document.querySelector('[role="progressbar"]').setAttribute('aria-valuemax', notes.length);
+}
+
+function showFeedback(title, copy, kind) {
+  document.getElementById('feedback-title').textContent = title;
+  document.getElementById('feedback-copy').textContent = copy;
+  feedback.dataset.kind = kind;
+}
+
+function completeNote(note, diff) {
+  if (note.done) return;
+  note.done = true;
+  stats.reactions.push(diff);
+  const perfect = diff < PERFECT;
+  createHitBurst(noteLanes(note), perfect, note.kind === 'chord' ? 1.15 : 1);
+  const patternMultiplier = note.kind === 'triple' || note.kind === 'chord' ? 2 : note.kind === 'double' || note.kind === 'hold' ? 1.5 : 1;
+  const streakMultiplier = Math.min(4, 1 + Math.floor((combo + 1) / 10));
+  const points = Math.round((perfect ? 100 : 50) * patternMultiplier * streakMultiplier);
+  if (perfect) stats.perfect++;
+  else stats.good++;
+  score += points;
+  msg = perfect ? 'PERFECT' : 'GOOD';
+  showFeedback(perfect ? 'Perfect!' : 'Good hit!', `${note.kind === 'chord' ? `${noteLanes(note).length}-lane chord` : note.kind === 'hold' ? 'Hold complete' : note.kind === 'double' || note.kind === 'triple' ? `${note.count}-tap combo` : 'Dead on the beat'} · +${points} points`, 'good');
+  combo++;
+  maxCombo = Math.max(maxCombo, combo);
+  updateStats();
+}
+
+function missNote(note) {
+  if (note.done) return;
+  note.done = true;
+  stats.miss++;
+  combo = 0;
+  msg = 'MISS';
+  showFeedback('Missed it', 'Reset your streak and catch the next pattern.', 'miss');
+  updateStats();
+}
+
+function currentTarget(note) {
+  return note.time + (note.kind === 'double' || note.kind === 'triple' ? note.progress * (note.gap || MULTI_GAP) : 0);
+}
+
+function keyDown(lane, now = gameTime()) {
+  if (!difficultySelected || lane >= activeLaneCount || finished || held[lane]) return;
+  held[lane] = true;
+  downAt[lane] = now;
+
+  const hold = notes.find(n => !n.done && n.kind === 'hold' && !n.started && n.lane === lane && Math.abs(n.time - now) <= GOOD);
+  if (hold) {
+    hold.started = true;
+    hold.startedAt = now;
+    hold.startDiff = Math.abs(hold.time - now);
+    showFeedback('Hold it!', 'Keep the key pressed until the note bar ends.', 'ready');
+    return;
+  }
+
+  const repeated = notes.find(n => !n.done && (n.kind === 'double' || n.kind === 'triple') && n.lane === lane && Math.abs(currentTarget(n) - now) <= GOOD);
+  if (repeated) {
+    repeated.hitDiffs.push(Math.abs(currentTarget(repeated) - now));
+    repeated.progress++;
+    if (repeated.progress === repeated.count) {
+      completeNote(repeated, repeated.hitDiffs.reduce((sum, diff) => sum + diff, 0) / repeated.hitDiffs.length);
+    } else {
+      createHitBurst([lane], Math.abs(currentTarget(repeated) - now) < PERFECT, .55);
+      showFeedback(`${repeated.count - repeated.progress} more!`, `Keep tapping ${keyNames[lane]} on the beat.`, 'ready');
+    }
+    return;
+  }
+
+  const tap = notes.find(n => !n.done && n.kind === 'tap' && n.lane === lane && Math.abs(n.time - now) <= GOOD);
+  if (tap) {
+    completeNote(tap, Math.abs(tap.time - now));
+    return;
+  }
+
+  const chord = notes.find(n => !n.done && n.kind === 'chord' && Math.abs(n.time - now) <= GOOD);
+  if (chord) {
+    const chordLanes = noteLanes(chord);
+    if (!chordLanes.every(chordLane => held[chordLane])) return;
+    const times = chordLanes.map(chordLane => downAt[chordLane]);
+    const spread = Math.max(...times) - Math.min(...times);
+    const timingDiff = Math.max(...times.map(time => Math.abs(time - chord.time)));
+    if (spread <= CHORD_SPREAD && timingDiff <= GOOD) completeNote(chord, timingDiff);
+  }
+}
+
+function keyUp(lane, now = gameTime()) {
+  if (!held[lane]) return;
+  held[lane] = false;
+  downAt[lane] = null;
+  if (finished) return;
+  const hold = notes.find(n => !n.done && n.kind === 'hold' && n.started && n.lane === lane);
+  if (!hold) return;
+  const heldFor = now - hold.startedAt;
+  if (heldFor >= hold.duration - GOOD) {
+    const releaseDiff = Math.abs(hold.startedAt + hold.duration - now);
+    completeNote(hold, (hold.startDiff + releaseDiff) / 2);
+  } else {
+    missNote(hold);
+  }
+}
+
+const ws = new WebSocket('ws://' + location.host);
+ws.onopen = () => {
+  status.dataset.state = 'connected';
+  statusText.textContent = 'Server connected · ESP32 ready';
+};
+ws.onclose = () => {
+  status.dataset.state = 'disconnected';
+  statusText.textContent = 'Server disconnected';
+};
+ws.onerror = () => {
+  status.dataset.state = 'disconnected';
+  statusText.textContent = 'Could not reach game server';
+};
+ws.onmessage = e => {
+  try {
+    const input = JSON.parse(e.data);
+    if (input.type === 'up') keyUp(input.lane);
+    else {
+      keyDown(input.lane);
+      if (input.type !== 'down') keyUp(input.lane);
+    }
+  } catch (_) {}
+};
+
+const keys = { d: 0, f: 1, j: 2, k: 3 };
+addEventListener('keydown', e => {
+  const key = e.key.toLowerCase();
+  if (key in keys && !e.repeat) keyDown(keys[key]);
+});
+addEventListener('keyup', e => {
+  const key = e.key.toLowerCase();
+  if (key in keys) keyUp(keys[key]);
+});
+addEventListener('blur', () => {
+  held.forEach((isDown, lane) => { if (isDown) keyUp(lane); });
+});
+
+// The four fret circles on the playfield can also be used as on-screen
+// buttons. They share keyDown/keyUp so timing and hit explosions stay
+// identical for keyboard, touch, mouse, and the ESP32 controller.
+const activePointers = new Map();
+function pointerLane(event) {
+  const rect = canvas.getBoundingClientRect();
+  const position = (event.clientX - rect.left) / rect.width;
+  return Math.max(0, Math.min(activeLaneCount - 1, Math.floor(position * activeLaneCount)));
+}
+function releasePointer(event) {
+  const lane = activePointers.get(event.pointerId);
+  if (lane === undefined) return;
+  activePointers.delete(event.pointerId);
+  keyUp(lane);
+}
+canvas.addEventListener('pointerdown', event => {
+  event.preventDefault();
+  const lane = pointerLane(event);
+  activePointers.set(event.pointerId, lane);
+  canvas.setPointerCapture(event.pointerId);
+  keyDown(lane);
+});
+canvas.addEventListener('pointerup', releasePointer);
+canvas.addEventListener('pointercancel', releasePointer);
+canvas.addEventListener('lostpointercapture', releasePointer);
+
+difficultyOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    activeLaneCount = Number(option.dataset.lanes);
+    difficultySelected = true;
+    applyDifficulty();
+    difficultyModal.hidden = true;
+    resetGame();
+    const label = activeLaneCount === 2 ? 'Easy' : activeLaneCount === 3 ? 'Medium' : 'Hard';
+    difficultyLabel.textContent = `${label} · ${activeLaneCount} lanes`;
+    showFeedback(`${label} mode`, `${activeLaneCount} lanes active · follow the notes to the line.`, 'ready');
+  });
+});
+
+function resetGame() {
+  score = 0;
+  combo = 0;
+  maxCombo = 0;
+  msg = '';
+  finished = false;
+  stats.perfect = 0;
+  stats.good = 0;
+  stats.miss = 0;
+  stats.reactions.length = 0;
+  if (!chartLoaded) {
+    sourceNotes.forEach((note, index) => { note.time = LEAD_IN + index * (60 / chartBpm); });
+    if (difficultySelected) applyDifficulty();
+    else notes = sourceNotes;
+  }
+  notes.forEach((note, index) => {
+    note.progress = 0;
+    note.hitDiffs.length = 0;
+    note.started = false;
+    note.startedAt = 0;
+    note.startDiff = 0;
+    note.done = false;
+  });
+  held.fill(false);
+  downAt.fill(null);
+  hitEffects.length = 0;
+  t0 = performance.now();
+  updateStats();
+}
+
+function updateSongControls() {
+  const ready = songMode && chartLoaded;
+  songToggle.disabled = !ready;
+  songToggle.textContent = ready ? 'Play song' : songMode ? 'Load guitar chart' : 'Choose song + guitar chart';
+}
+
+songFile.addEventListener('change', event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (songObjectUrl) URL.revokeObjectURL(songObjectUrl);
+  songObjectUrl = URL.createObjectURL(file);
+  songMode = true;
+  songAudio.pause();
+  songAudio.src = songObjectUrl;
+  songAudio.load();
+  resetGame();
+  songName.textContent = file.name;
+  updateSongControls();
+  showFeedback(chartLoaded ? 'Song loaded' : 'Guitar chart required', chartLoaded ? 'Press play when you are ready for exact sync.' : 'Load the matching guitar chart JSON before playing.', chartLoaded ? 'ready' : 'miss');
+});
+
+chartFile.addEventListener('change', async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    const isMidi = /\.midi?$/i.test(file.name);
+    const data = isMidi
+      ? midiToChart(await file.arrayBuffer(), file.name)
+      : JSON.parse(await file.text());
+    loadChart(data);
+    if (songMode) {
+      songAudio.pause();
+      songAudio.currentTime = 0;
+    }
+    resetGame();
+    chartName.textContent = `${file.name} · ${notes.length} ${isMidi ? 'MIDI-converted' : 'guitar'} events · ${data.bpm || chartBpm} BPM`;
+    updateSongControls();
+    showFeedback(songMode ? 'Guitar chart loaded' : 'Chart loaded', songMode ? 'The song and chart are ready to play together.' : 'Load the matching song audio to play this chart.', 'ready');
+  } catch (error) {
+    chartName.textContent = `Chart error · ${error.message}`;
+    showFeedback('Invalid guitar chart', error.message, 'miss');
+  }
+});
+
+songBpm.addEventListener('change', () => {
+  if (chartLoaded) {
+    songBpm.value = chartBpm;
+    showFeedback('Exact chart timing locked', 'BPM is informational when a guitar chart is loaded.', 'ready');
+    return;
+  }
+  const nextBpm = Number(songBpm.value);
+  chartBpm = Number.isFinite(nextBpm) ? Math.max(40, Math.min(240, Math.round(nextBpm))) : 63;
+  songBpm.value = chartBpm;
+  if (songMode) {
+    songAudio.pause();
+    songAudio.currentTime = 0;
+  }
+  resetGame();
+  if (songMode) showFeedback('BPM updated', 'Load a guitar chart for exact guitar-part timing.', 'ready');
+});
+
+songToggle.addEventListener('click', async () => {
+  if (!songAudio.src || !chartLoaded) return;
+  if (finished || songAudio.ended) {
+    songAudio.currentTime = 0;
+    resetGame();
+  }
+  if (songAudio.paused) {
+    try {
+      await songAudio.play();
+      songToggle.textContent = 'Pause song';
+      showFeedback('Song playing', 'Exact guitar chart sync · follow the notes to the line.', 'ready');
+    } catch (_) {
+      showFeedback('Could not play song', 'Choose a supported audio file and try again.', 'miss');
+    }
+  } else {
+    songAudio.pause();
+  }
+});
+
+songAudio.addEventListener('pause', () => {
+  if (songMode && !songAudio.ended && !finished) {
+    songToggle.textContent = 'Resume song';
+    showFeedback('Song paused', 'Resume when you are ready to continue.', 'ready');
+  }
+});
+songAudio.addEventListener('ended', () => {
+  songToggle.textContent = 'Replay song';
+  if (!finished) finish();
+});
+
+function finish() {
+  finished = true;
+  if (songMode && !songAudio.paused) songAudio.pause();
+  if (songMode) songToggle.textContent = 'Replay song';
+  const total = stats.perfect + stats.good + stats.miss;
+  const result = {
+    accuracy: total ? (stats.perfect + stats.good) / total : 0,
+    avgReaction: stats.reactions.length ? stats.reactions.reduce((a, b) => a + b, 0) / stats.reactions.length : 0,
+    missRate: total ? stats.miss / total : 0,
+    maxCombo, score, ...stats
+  };
+  showFeedback('Track complete!', `Final score: ${score.toLocaleString()} points`, 'good');
+  fetch('/api/results', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(result) });
+}
+
+/*
+function drawPerspectiveGame(now) {
+  ctx.clearRect(0, 0, 400, 600);
+
+  const background = ctx.createLinearGradient(0, 0, 0, 600);
+  background.addColorStop(0, '#101820');
+  background.addColorStop(.5, '#090d12');
+  background.addColorStop(1, '#030405');
+  ctx.fillStyle = background;
+  ctx.fillRect(0, 0, 400, 600);
+
+  const boardPath = () => {
+    ctx.beginPath();
+    ctx.moveTo(highwayLeftAt(0), 0);
+    ctx.lineTo(400 - highwayLeftAt(0), 0);
+    ctx.lineTo(400, 600);
+    ctx.lineTo(0, 600);
+    ctx.closePath();
+  };
+
+  const board = ctx.createLinearGradient(0, 0, 0, 600);
+  board.addColorStop(0, '#171b20');
+  board.addColorStop(.45, '#080b0f');
+  board.addColorStop(1, '#020304');
+  boardPath();
+  ctx.fillStyle = board;
+  ctx.fill();
+
+  ctx.save();
+  boardPath();
+  ctx.clip();
+  for (let i = 0; i < activeLaneCount; i++) {
+    const topLeft = highwayLeftAt(0) + i * laneWidthAt(0);
+    const topRight = topLeft + laneWidthAt(0);
+    const bottomLeft = highwayLeftAt(600) + i * laneWidthAt(600);
+    const bottomRight = bottomLeft + laneWidthAt(600);
+    ctx.beginPath();
+    ctx.moveTo(topLeft, 0);
+    ctx.lineTo(topRight, 0);
+    ctx.lineTo(bottomRight, 600);
+    ctx.lineTo(bottomLeft, 600);
+    ctx.closePath();
+    ctx.fillStyle = i % 2 ? 'rgba(255,255,255,.018)' : 'rgba(0,0,0,.12)';
+    ctx.fill();
+  }
+
+  // Fixed frets plus moving beat guides make the board read as a deep highway.
+  for (let fret = 1; fret < 12; fret++) {
+    const y = fret * 58;
+    ctx.strokeStyle = fret % 4 === 0 ? 'rgba(240,229,205,.18)' : 'rgba(240,229,205,.09)';
+    ctx.lineWidth = fret % 4 === 0 ? 1.5 : 1;
+    ctx.beginPath();
+    ctx.moveTo(highwayLeftAt(y), y);
+    ctx.lineTo(400 - highwayLeftAt(y), y);
+    ctx.stroke();
+  }
+  for (let beat = 0; beat < 10; beat++) {
+    const y = ((now * SPEED + beat * 60) % 600);
+    ctx.strokeStyle = 'rgba(240,229,205,.075)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(highwayLeftAt(y), y);
+    ctx.lineTo(400 - highwayLeftAt(y), y);
+    ctx.stroke();
+  }
+  for (let i = 0; i <= activeLaneCount; i++) {
+    const topX = highwayLeftAt(0) + i * laneWidthAt(0);
+    const bottomX = highwayLeftAt(600) + i * laneWidthAt(600);
+    ctx.strokeStyle = i === 0 || i === activeLaneCount
+      ? 'rgba(240,229,205,.34)'
+      : 'rgba(240,229,205,.23)';
+    ctx.lineWidth = i === 0 || i === activeLaneCount ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(topX, 0);
+    ctx.lineTo(bottomX, 600);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Key labels and a small glow at the distant end of each lane.
+  for (let i = 0; i < activeLaneCount; i++) {
+    const x = laneCenterAt(i, 34);
+    ctx.fillStyle = colors[i];
+    ctx.font = 'bold 11px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(keyNames[i], x, 24);
+    ctx.globalAlpha = .25;
+    ctx.fillRect(x - 4, 36, 8, 2);
+    ctx.globalAlpha = 1;
+    if (held[i]) {
+      ctx.save();
+      ctx.globalAlpha = .3;
+      ctx.fillStyle = colors[i];
+      ctx.shadowColor = colors[i];
+      ctx.shadowBlur = 18;
+      laneSegmentPath(i, 28, 46, .8);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  const hitLeft = highwayLeftAt(HIT_Y);
+  const hitRight = 400 - hitLeft;
+  ctx.strokeStyle = 'rgba(240,229,205,.2)';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(hitLeft, HIT_Y);
+  ctx.lineTo(hitRight, HIT_Y);
+  ctx.stroke();
+  ctx.strokeStyle = '#ef2925';
+  ctx.shadowColor = '#ef2925';
+  ctx.shadowBlur = 18;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(hitLeft, HIT_Y);
+  ctx.lineTo(hitRight, HIT_Y);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  const buttonY = HIT_Y + 20;
+  for (let i = 0; i < activeLaneCount; i++) {
+    const x = laneCenterAt(i, buttonY);
+    const radius = 16;
+    ctx.beginPath();
+    ctx.arc(x, buttonY, radius, 0, Math.PI * 2);
+    ctx.fillStyle = held[i] ? colors[i] : '#080b0e';
+    ctx.shadowColor = colors[i];
+    ctx.shadowBlur = held[i] ? 22 : 8;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, buttonY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = held[i] ? '#fff' : colors[i];
+    ctx.fill();
+  }
+
+  for (const n of notes) {
+    if (n.done) continue;
+    const target = currentTarget(n);
+    if (n.kind === 'hold' && n.started && held[n.lane] && now >= n.startedAt + n.duration) {
+      completeNote(n, n.startDiff);
+      continue;
+    }
+    if (!n.started && now - target > GOOD) {
+      missNote(n);
+      continue;
+    }
+    const y = n.kind === 'hold' && n.started ? HIT_Y : HIT_Y - (target - now) * SPEED;
+    const visualScale = .68 + .32 * clamp(y / 600, 0, 1);
+    let noteY = y;
+    let noteHeight = 18;
+    if (n.kind === 'hold') {
+      const tailLength = n.duration * SPEED;
+      const remaining = Math.max(0, n.startedAt + n.duration - now);
+      // The active sustain tail stays above the line instead of inverting
+      // and growing below the fret button.
+      noteY = n.started ? HIT_Y - remaining * SPEED : y - tailLength;
+      noteHeight = n.started ? remaining * SPEED : tailLength;
+      ctx.save();
+      ctx.globalAlpha = .78;
+      ctx.fillStyle = colors[n.lane];
+      ctx.shadowColor = colors[n.lane];
+      ctx.shadowBlur = 13;
+      laneSegmentPath(n.lane, noteY, noteY + noteHeight, .42);
+      ctx.fill();
+      ctx.restore();
+      drawHoldShine(noteY, noteHeight, n, now);
+    }
+
+    if (n.kind === 'chord') {
+      const chordLanes = noteLanes(n);
+      const firstLane = Math.min(...chordLanes);
+      const lastLane = Math.max(...chordLanes);
+      const chordStart = laneCenterAt(firstLane, y);
+      const chordEnd = laneCenterAt(lastLane, y);
+      ctx.save();
+      ctx.strokeStyle = '#f0e5cd';
+      ctx.shadowColor = '#f0e5cd';
+      ctx.shadowBlur = 12;
+      ctx.lineWidth = Math.max(7, 12 * visualScale);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(chordStart, y);
+      ctx.lineTo(chordEnd, y);
+      ctx.stroke();
+      ctx.restore();
+      for (const laneIndex of chordLanes) {
+        drawGem(laneCenterAt(laneIndex, y), y, Math.max(8, 12 * visualScale), colors[laneIndex]);
+      }
+      if (chordLanes.length > 1) {
+        ctx.fillStyle = '#11100f';
+        ctx.font = `bold ${Math.max(7, 8 * visualScale)}px Segoe UI, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(chordLanes.length === 4 ? 'ALL 4' : 'CHORD', (chordStart + chordEnd) / 2, y + 3);
+      }
+    } else {
+      const x = laneCenterAt(n.lane, y);
+      const label = n.kind === 'hold' ? 'H' : n.kind === 'double' || n.kind === 'triple' ? `x${n.count}` : '';
+      drawGem(x, y, Math.max(9, (n.kind === 'hold' ? 13 : 14) * visualScale), colors[n.lane], label);
+    }
+  }
+}
+*/
+
+function loop() {
+  const now = gameTime();
+  const currentLaneWidth = laneWidth();
+  ctx.clearRect(0, 0, 400, 600);
+
+  for (let i = 0; i < activeLaneCount; i++) {
+    ctx.fillStyle = i % 2 ? '#100f0e' : '#151311';
+    ctx.fillRect(i * currentLaneWidth, 0, currentLaneWidth, 600);
+    ctx.strokeStyle = 'rgba(240,229,205,.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(i * currentLaneWidth + .5, 0);
+    ctx.lineTo(i * currentLaneWidth + .5, 600);
+    ctx.stroke();
+    ctx.fillStyle = colors[i];
+    ctx.font = 'bold 12px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(keyNames[i], i * currentLaneWidth + currentLaneWidth / 2, 27);
+    ctx.globalAlpha = .2;
+    ctx.fillRect(i * currentLaneWidth + currentLaneWidth / 2 - 4, 38, 8, 2);
+    ctx.globalAlpha = 1;
+  }
+  held.forEach((isDown, lane) => {
+    if (isDown && lane < activeLaneCount) {
+      ctx.fillStyle = 'rgba(239,41,37,.28)';
+      ctx.fillRect(lane * currentLaneWidth + 1, 38, currentLaneWidth - 2, 3);
+    }
+  });
+  ctx.fillStyle = 'rgba(240,229,205,.08)';
+  ctx.fillRect(0, HIT_Y - 1, 400, 3);
+  ctx.fillStyle = '#ef2925';
+  ctx.shadowColor = '#ef2925';
+  ctx.shadowBlur = 14;
+  ctx.fillRect(0, HIT_Y, 400, 3);
+  ctx.shadowBlur = 0;
+  for (let beat = 0; beat < 10; beat++) {
+    const y = ((now * SPEED + beat * 60) % 600);
+    ctx.strokeStyle = 'rgba(240,229,205,.055)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(400, y);
+    ctx.stroke();
+  }
+  for (let i = 0; i < activeLaneCount; i++) {
+    const x = i * currentLaneWidth + currentLaneWidth / 2;
+    ctx.beginPath();
+    ctx.arc(x, HIT_Y + 20, 15, 0, Math.PI * 2);
+    ctx.fillStyle = held[i] ? colors[i] : '#151311';
+    ctx.fill();
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, HIT_Y + 20, 5, 0, Math.PI * 2);
+    ctx.fillStyle = held[i] ? '#fff' : colors[i];
+    ctx.fill();
+  }
+
+  for (const n of notes) {
+    if (n.done) continue;
+    const target = currentTarget(n);
+    if (n.kind === 'hold' && n.started && held[n.lane] && now >= n.startedAt + n.duration) {
+      completeNote(n, n.startDiff);
+      continue;
+    }
+    if (!n.started && now - target > GOOD) {
+      missNote(n);
+      continue;
+    }
+    const y = n.kind === 'hold' && n.started ? HIT_Y : HIT_Y - (target - now) * SPEED;
+    const lane = n.kind === 'chord' ? 0 : n.lane;
+    const width = n.kind === 'chord' ? 390 : n.kind === 'hold' ? 30 : Math.min(74, currentLaneWidth - 20);
+    const x = n.kind === 'chord' ? 5 : lane * currentLaneWidth + (currentLaneWidth - width) / 2;
+    let noteY = y;
+    let noteHeight = 18;
+    if (n.kind === 'hold') {
+      const tailLength = n.duration * SPEED;
+      const remaining = Math.max(0, n.startedAt + n.duration - now);
+      // The sustain tail trails behind the note as it falls. Once the head
+      // reaches the strike line, keep the remaining tail above the line and
+      // let it shrink toward the button instead of growing below it.
+      noteY = n.started ? HIT_Y - remaining * SPEED : y - tailLength;
+      noteHeight = n.started ? remaining * SPEED : tailLength;
+    }
+    const noteColor = n.kind === 'chord' ? '#f0e5cd' : colors[n.lane];
+    ctx.fillStyle = noteColor;
+    ctx.shadowColor = noteColor;
+    ctx.shadowBlur = 12;
+    if (n.kind === 'hold') {
+      ctx.globalAlpha = .75;
+      ctx.fillRect(x + 10, noteY, width - 20, noteHeight);
+      ctx.globalAlpha = 1;
+      drawHoldShine(x, width, noteY, noteHeight, n, now);
+    }
+    if (n.kind === 'chord') {
+      const chordLanes = noteLanes(n);
+      const firstLane = Math.min(...chordLanes);
+      const lastLane = Math.max(...chordLanes);
+      const chordStart = firstLane * currentLaneWidth + currentLaneWidth / 2;
+      const chordEnd = lastLane * currentLaneWidth + currentLaneWidth / 2;
+      ctx.fillRect(chordStart, y - 7, chordEnd - chordStart, 14);
+      for (const laneIndex of chordLanes) {
+        ctx.beginPath();
+        ctx.arc(laneIndex * currentLaneWidth + currentLaneWidth / 2, y, 11, 0, Math.PI * 2);
+        ctx.fillStyle = colors[laneIndex];
+        ctx.fill();
+      }
+    } else {
+      ctx.beginPath();
+      ctx.arc(x + width / 2, y, n.kind === 'hold' ? 12 : 13, 0, Math.PI * 2);
+      ctx.fillStyle = noteColor;
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#11100f';
+    ctx.font = 'bold 9px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    const label = n.kind === 'chord' ? (noteLanes(n).length === 4 ? 'ALL 4' : 'CHORD') : n.kind === 'hold' ? 'H' : n.kind === 'double' || n.kind === 'triple' ? `×${n.count}` : '';
+    if (label) {
+      const labelX = n.kind === 'chord'
+        ? (Math.min(...noteLanes(n)) * currentLaneWidth + currentLaneWidth / 2 + Math.max(...noteLanes(n)) * currentLaneWidth + currentLaneWidth / 2) / 2
+        : x + width / 2;
+      ctx.fillText(label, labelX, y + 3);
+    }
+  }
+
+  drawHitEffects(performance.now());
+  if (!finished && notes.every(n => n.done)) finish();
+  requestAnimationFrame(loop);
+}
+updateStats();
+loop();
+</script>
+</body>
+</html>
