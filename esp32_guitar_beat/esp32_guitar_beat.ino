@@ -1,52 +1,52 @@
 #include <WiFi.h>
 #include <WebSocketsClient.h>   // "WebSockets" by Markus Sattler
 
-// ---- EDIT THESE ----
-const char* ssid = "WIFI_NAME";
+// ---------- EDIT THESE 3 LINES ----------
+const char* ssid = "WIFI_NAME";        // Wi-Fi / hotspot name (2.4 GHz)
 const char* pass = "WIFI_PASSWORD";
-const char* host = "192.168.1.10";   // IP of the PC running server.js (use ipconfig)
+const char* host = "192.168.1.10";     // IPv4 of the PC running the app (ipconfig)
+// ----------------------------------------
 const uint16_t port = 3000;
-// --------------------
 
-const int pins[4]    = {13, 12, 14, 27};   // buttons -> GND (INPUT_PULLUP)
-const int ledPins[4] = {26, 25, 33, 32};   // optional LEDs (with 220 ohm resistor)
-const int buzzerPin  = 15;                 // optional buzzer
+// Lane 0..3 = D, F, J, K
+const int pins[4] = {13, 12, 14, 27};  // button -> GND (INPUT_PULLUP)
 
 bool last[4] = {HIGH, HIGH, HIGH, HIGH};
 unsigned long lastTime[4] = {0, 0, 0, 0};
 WebSocketsClient ws;
 
+void onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
+  if (type == WStype_CONNECTED)    Serial.println("[WS] Connected to server");
+  if (type == WStype_DISCONNECTED) Serial.println("[WS] Disconnected (retrying...)");
+}
+
 void setup() {
   Serial.begin(115200);
-  for (int i = 0; i < 4; i++) {
-    pinMode(pins[i], INPUT_PULLUP);
-    pinMode(ledPins[i], OUTPUT);
-  }
-  pinMode(buzzerPin, OUTPUT);
+  for (int i = 0; i < 4; i++) pinMode(pins[i], INPUT_PULLUP);
 
   WiFi.begin(ssid, pass);
   Serial.print("Connecting WiFi");
   while (WiFi.status() != WL_CONNECTED) { delay(300); Serial.print("."); }
-  Serial.println("\nConnected: " + WiFi.localIP().toString());
+  Serial.println("\nWiFi connected. ESP32 IP: " + WiFi.localIP().toString());
 
   ws.begin(host, port, "/");
+  ws.onEvent(onWsEvent);
   ws.setReconnectInterval(2000);
 }
 
 void loop() {
   ws.loop();
+
   for (int i = 0; i < 4; i++) {
-    bool s = digitalRead(pins[i]);
-    if (s != last[i] && millis() - lastTime[i] > 20) {   // debounce
+    bool s = digitalRead(pins[i]);                       // LOW = pressed
+    if (s != last[i] && millis() - lastTime[i] > 60) {   // 60 ms debounce
       lastTime[i] = millis();
       last[i] = s;
-      digitalWrite(ledPins[i], s == LOW);
-      if (s == LOW) {
-        ws.sendTXT("{\"type\":\"down\",\"lane\":" + String(i) + "}");
-        tone(buzzerPin, 400 + i * 150, 60);
-      } else {
-        ws.sendTXT("{\"type\":\"up\",\"lane\":" + String(i) + "}");
-      }
+
+      String msg = String("{\"type\":\"") + (s == LOW ? "down" : "up") +
+                   "\",\"lane\":" + String(i) + "}";
+      ws.sendTXT(msg);
+      Serial.println(msg);
     }
   }
 }

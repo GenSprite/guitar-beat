@@ -430,6 +430,44 @@
     .side-panel .panel:first-child { grid-column: auto; }
     .footer { flex-direction: column; gap: 7px; }
   }
+  /* ===== Pause / restart / rounds / AI coach ===== */
+  .game-actions { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; width: min(100%, 400px); margin: 0 auto 10px; }
+  .round-chip { display: inline-flex; align-items: center; gap: 6px; margin-right: auto; padding: 5px 9px; border: 1px solid rgba(239, 41, 37, .4); color: #ff7770; font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+  .round-chip select { padding: 2px 3px; border: 1px solid rgba(240, 229, 205, .25); border-radius: 2px; color: var(--paper); background: #26221e; font: inherit; font-size: 10px; }
+  .game-btn { min-height: 30px; padding: 0 12px; border: 1px solid rgba(239, 41, 37, .55); border-radius: 2px; color: var(--paper); background: rgba(239, 41, 37, .12); cursor: pointer; font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+  .game-btn:hover:not(:disabled), .game-btn:focus-visible:not(:disabled) { background: rgba(239, 41, 37, .3); outline: none; }
+  .game-btn:disabled { cursor: not-allowed; opacity: .4; }
+  .ov-btn-main { background: var(--red); border-color: var(--red); }
+  .ov-btn-main:hover:not(:disabled), .ov-btn-main:focus-visible:not(:disabled) { background: #ff4a45; }
+  .overlay { position: absolute; z-index: 5; inset: 0; display: grid; place-items: center; padding: 12px; overflow-y: auto; background: rgba(8, 7, 6, .84); backdrop-filter: blur(3px); }
+  .overlay[hidden] { display: none; }
+  .ov-card { width: 100%; padding: 16px 14px; border: 1px solid rgba(240, 229, 205, .28); border-top: 3px solid var(--red); background: linear-gradient(145deg, rgba(239, 41, 37, .12), transparent 55%), #181614; text-align: center; }
+  .ov-kicker { margin: 0 0 6px; color: var(--red); font-size: 9px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; }
+  .ov-title { margin: 0; color: var(--paper); font-family: Impact, "Arial Narrow", sans-serif; font-size: 32px; letter-spacing: .03em; text-transform: uppercase; }
+  .ov-title.win { color: #acd585; }
+  .ov-title.lose { color: #f07867; }
+  .ov-copy { margin: 8px 0 14px; color: var(--paper-dim); font-size: 11px; line-height: 1.5; }
+  .ov-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; }
+  .ov-stats div { padding: 8px 4px; border: 1px solid var(--line); background: rgba(0, 0, 0, .2); }
+  .ov-stats span { display: block; color: #9c9385; font-size: 8px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .ov-stats strong { display: block; margin-top: 4px; color: var(--paper); font-size: 16px; }
+  .ov-reqs, .req-list { margin: 0 0 12px; padding: 0; list-style: none; }
+  .ov-reqs li, .req-list li { display: flex; justify-content: space-between; gap: 8px; padding: 5px 2px; border-bottom: 1px solid var(--line); color: var(--paper-dim); font-size: 10px; text-align: left; }
+  .ov-reqs li.ok, .req-list li.ok { color: #acd585; }
+  .ov-reqs li.bad, .req-list li.bad { color: #f07867; }
+  .ov-ai, .ai-box { display: grid; gap: 4px; margin: 0 0 12px; padding: 9px 10px; border-left: 3px solid #53b8ef; background: rgba(83, 184, 239, .08); color: var(--paper-dim); font-size: 10px; line-height: 1.5; text-align: left; }
+  .ov-ai b, .ai-box strong { color: var(--paper); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+  .ov-actions { display: flex; gap: 8px; }
+  .ov-actions .game-btn { flex: 1; min-height: 38px; }
+  .ov-count { color: var(--red); font-family: Impact, "Arial Narrow", sans-serif; font-size: 96px; line-height: 1; text-shadow: 3px 3px 0 var(--red-dark); }
+  .round-head { display: flex; justify-content: space-between; gap: 8px; color: var(--paper); font-size: 12px; font-weight: 800; }
+  .round-head span { color: #9c9385; font-size: 10px; letter-spacing: .06em; }
+  .round-dots { display: flex; gap: 4px; margin: 10px 0 12px; }
+  .round-dots span { flex: 1; height: 6px; background: #37312b; }
+  .round-dots span.done { background: #9fca76; }
+  .round-dots span.cur { background: var(--red); }
+  .link-btn { margin-top: 2px; padding: 0; border: 0; color: #766e62; background: none; cursor: pointer; font-size: 9px; letter-spacing: .1em; text-decoration: underline; text-transform: uppercase; }
+  .link-btn:hover { color: var(--paper-dim); }
 </style>
 </head>
 <body>
@@ -461,8 +499,16 @@
           <div class="track-label">Now playing<strong>Electric riff / Track 01</strong></div>
           <div class="playing">Live session</div>
         </div>
+        <div class="game-actions">
+          <label class="round-chip" id="round-chip">Round <select id="round-select" aria-label="Choose an unlocked round"></select> / <span id="round-max">10</span></label>
+          <button class="game-btn" id="pause-btn" type="button" disabled>&#10074;&#10074; Pause</button>
+          <button class="game-btn" id="restart-btn" type="button" disabled>&#8635; Restart</button>
+        </div>
         <div class="screen-wrap">
           <canvas id="c" width="400" height="600" aria-label="Rhythm game playfield"></canvas>
+          <div class="overlay" id="round-overlay" role="dialog" aria-modal="true" aria-live="polite" hidden>
+            <div class="ov-card" id="overlay-card"></div>
+          </div>
         </div>
         <div class="song-controls" aria-label="Song player">
           <label class="song-file">Load a song
@@ -502,14 +548,24 @@
           <div class="feedback-copy"><strong id="feedback-title">Get ready</strong><span id="feedback-copy">First notes are on their way.</span></div>
         </div>
 
+        <section class="panel" aria-label="Round progression">
+          <h2 class="panel-title">Round progress</h2>
+          <div class="round-head"><strong id="round-label">Round 1 of 10</strong><span id="round-unlocked">Unlocked 1 / 10</span></div>
+          <div class="round-dots" id="round-dots" aria-hidden="true"></div>
+          <ul class="req-list" id="req-list" aria-label="Requirements to clear this round"></ul>
+          <div class="ai-box" id="ai-box"><strong id="ai-tier">AI coach</strong><span id="ai-copy">Finish a round and the coach will check your accuracy, reaction time and streaks, then tune the next round.</span></div>
+          <button class="link-btn" id="reset-progress" type="button">Reset saved progress</button>
+        </section>
+
         <section class="panel">
           <h2 class="panel-title">Your controls</h2>
           <div class="controls-list">
             <div class="control-item"><span>Fret + strum</span><div class="key-group" aria-label="D F J K keys"><kbd>D</kbd><kbd>F</kbd><kbd>J</kbd><kbd>K</kbd></div></div>
             <div class="control-item"><span>Difficulty</span><strong id="difficulty-label" style="color:var(--paper);font-size:11px">Choose at start</strong></div>
             <div class="control-item"><span>Controller</span><strong style="color:var(--paper);font-size:11px">ESP32 ready</strong></div>
+            <div class="control-item"><span>Pause</span><div class="key-group"><kbd>P</kbd><kbd>Esc</kbd></div></div>
           </div>
-          <p class="controller-note"><strong>Fret + strum:</strong> press the matching key as its gem reaches the line. <strong>Double / triple:</strong> strum repeatedly. <strong>Hold:</strong> keep the button down to the end of the tail. <strong>Chord:</strong> press all four together.</p>
+          <p class="controller-note"><strong>Fret + strum:</strong> press the matching key as its gem reaches the line. <strong>Hold:</strong> keep the button down to the end of the tail. <strong>Chord:</strong> press all four together.</p>
         </section>
       </aside>
     </section>
@@ -534,11 +590,13 @@ const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 // Faster highway scroll, similar to a Clone Hero-style note speed. This only
 // changes the visual travel rate; hit timing still follows the song clock.
-const HIT_Y = 520, SPEED = 540;
+const HIT_Y = 520, BASE_SPEED = 540;
+let SPEED = BASE_SPEED;
 const colors = ['#75d66f', '#ef4545', '#f4d34e', '#53b8ef'];
-const PERFECT = 0.05, GOOD = 0.15;
+const BASE_PERFECT = 0.05, BASE_GOOD = 0.15;
+let PERFECT = BASE_PERFECT, GOOD = BASE_GOOD;
 const HIT_EFFECT_DURATION = 300;
-const MULTI_GAP = 0.22, CHORD_SPREAD = 0.16, HOLD_DURATION = 0.75;
+const CHORD_SPREAD = 0.16, HOLD_DURATION = 0.75;
 let score = 0, combo = 0, maxCombo = 0, msg = '', finished = false;
 const stats = { perfect: 0, good: 0, miss: 0, reactions: [] };
 const LEAD_IN = 2;
@@ -547,21 +605,98 @@ let t0 = performance.now();
 let activeLaneCount = 4;
 let difficultySelected = false;
 
-const pattern = ['tap', 'double', 'tap', 'triple', 'hold', 'tap', 'chord', 'tap'];
+// ===== Rounds: saved progress, per-round difficulty, AI adjustment =====
+const MAX_ROUND = 10;
+const STORE_KEY = 'guitarBeat.progress.v1';
+const REQUIRE = { accuracy: 80, score: 5000, hitRate: 70 };
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+function loadProgress() {
+  const fresh = { cleared: 0, unlocked: 1, best: {}, aiLevel: 0, plays: 0, lastAi: null };
+  try {
+    const p = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (p && typeof p === 'object') {
+      const cleared = clamp(Math.floor(Number(p.cleared) || 0), 0, MAX_ROUND);
+      return {
+        cleared,
+        unlocked: Math.min(MAX_ROUND, cleared + 1),
+        best: p.best && typeof p.best === 'object' ? p.best : {},
+        aiLevel: clamp(Math.round(Number(p.aiLevel) || 0), -1, 1),
+        plays: Math.floor(Number(p.plays) || 0),
+        lastAi: p.lastAi || null
+      };
+    }
+  } catch (_) {}
+  return fresh;
+}
+function saveProgress() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(progress)); } catch (_) {}
+}
+const progress = loadProgress();
+let currentRound = progress.unlocked;
+let paused = false, frozenTime = 0, pauseStartedAt = 0, countdownTimer = null, inputBlockedUntil = 0;
+
+function mulberry32(seed) {
+  let a = seed | 0;
+  return function () {
+    a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Round 1 with a neutral AI level reproduces the original game exactly.
+// ai: -1 = beginner help, 0 = normal, +1 = advanced challenge.
+function roundConfig(round = currentRound, ai = progress.aiLevel) {
+  const g = round - 1;
+  const aiSpeed = [0.88, 1, 1.1][ai + 1];
+  const aiDensity = [0.8, 1, 1.12][ai + 1];
+  return {
+    round, ai,
+    speed: Math.round(BASE_SPEED * Math.min(1.6, 1 + 0.06 * g) * aiSpeed),
+    density: clamp((1 + 0.05 * g) * aiDensity, 0.7, 1.6),
+    complexity: clamp(g / 9 + ai * 0.12, 0, 1),
+    good: +clamp(BASE_GOOD - 0.006 * g + (ai < 0 ? 0.01 : ai > 0 ? -0.005 : 0), 0.1, 0.16).toFixed(3),
+    perfect: +clamp(BASE_PERFECT - 0.002 * g + (ai < 0 ? 0.005 : 0), 0.032, 0.055).toFixed(3)
+  };
+}
+function applyRoundConfig(cfg) {
+  SPEED = cfg.speed;
+  GOOD = cfg.good;
+  PERFECT = cfg.perfect;
+}
+
+const pattern = ['tap', 'tap', 'tap', 'tap', 'hold', 'tap', 'chord', 'tap'];
 const laneSequence = [0, 1, 2, 3, 2, 0, 1, 3, 1, 2, 0, 3, 0, 2, 3, 1];
-function createDefaultNotes() {
-  return Array.from({ length: 48 }, (_, i) => {
-    const kind = pattern[i % pattern.length];
+function createDefaultNotes(cfg = roundConfig()) {
+  // Same 48-beat song length at every round: higher density = more notes, closer together.
+  const beat = 60 / chartBpm;
+  const spacing = Math.max(0.5, beat / cfg.density);
+  const count = Math.round(48 * clamp(cfg.density, 0.75, 1.5));
+  const rand = mulberry32(cfg.round * 7919 + 13);
+  let prevLane = -1;
+  return Array.from({ length: count }, (_, i) => {
+    let kind = pattern[i % pattern.length];
+    let lane = laneSequence[i % laneSequence.length];
+    if (cfg.complexity > 0) {
+      if (kind === 'tap' && rand() < 0.5 * cfg.complexity) {
+        const r = rand();
+        kind = r < 0.7 ? 'hold' : 'chord';
+      }
+      if (rand() < 0.6 * cfg.complexity) lane = Math.floor(rand() * 4);
+      if (lane === prevLane) lane = (lane + 1 + Math.floor(rand() * 3)) % 4;
+    }
+    prevLane = lane;
     return {
       kind,
-      lane: laneSequence[i % laneSequence.length],
+      lane,
       lanes: kind === 'chord' ? [0, 1, 2, 3] : null,
-      time: LEAD_IN + i * (60 / chartBpm),
-      count: kind === 'double' ? 2 : kind === 'triple' ? 3 : 1,
-      gap: kind === 'double' || kind === 'triple' ? MULTI_GAP : 0,
+      time: LEAD_IN + i * spacing,
+      count: 1,
+      gap: 0,
       progress: 0,
       hitDiffs: [],
-      duration: kind === 'hold' ? HOLD_DURATION : 0,
+      duration: kind === 'hold' ? Math.min(HOLD_DURATION, Math.max(0.35, spacing * 0.9)) : 0,
       started: false,
       startedAt: 0,
       startDiff: 0,
@@ -571,6 +706,7 @@ function createDefaultNotes() {
 }
 let sourceNotes = createDefaultNotes();
 let notes = sourceNotes;
+applyRoundConfig(roundConfig());
 
 const status = document.getElementById('status');
 const statusText = document.getElementById('status-text');
@@ -596,6 +732,7 @@ const hitEffects = [];
 
 function gameTime() {
   if (!difficultySelected) return 0;
+  if (paused) return frozenTime;
   // Exact charts wait at time zero until both their audio and chart are ready.
   // The original built-in practice chart keeps its normal wall-clock mode.
   if (songMode && chartLoaded) return songAudio.currentTime;
@@ -636,7 +773,18 @@ function applyDifficulty() {
       filtered.push(cloneNote(sourceNote));
     }
   }
-  notes = filtered;
+  let result = filtered;
+  const cfg = roundConfig();
+  if (chartLoaded && cfg.density < 1) {
+    let acc = 0;
+    result = filtered.filter(n => {
+      if (n.kind !== 'tap') return true;
+      acc += cfg.density;
+      if (acc >= 1) { acc -= 1; return true; }
+      return false;
+    });
+  }
+  notes = result;
 }
 
 function noteLanes(note) {
@@ -644,8 +792,8 @@ function noteLanes(note) {
 }
 
 function normalizeChartNote(raw, index) {
-  const kinds = ['tap', 'double', 'triple', 'hold', 'chord'];
-  const kind = raw && kinds.includes(raw.kind) ? raw.kind : null;
+  const rawKind = raw && ['tap', 'double', 'triple', 'hold', 'chord'].includes(raw.kind) ? raw.kind : null;
+  const kind = rawKind === 'double' || rawKind === 'triple' ? 'tap' : rawKind;
   const time = Number(raw && raw.time);
   if (!kind || !Number.isFinite(time) || time < 0) {
     throw new Error(`Invalid note ${index + 1}: kind and non-negative time are required.`);
@@ -665,12 +813,9 @@ function normalizeChartNote(raw, index) {
     throw new Error(`Invalid note ${index + 1}: lane must be between 0 and 3.`);
   }
 
-  const count = kind === 'double' ? 2 : kind === 'triple' ? 3 : 1;
-  const gap = kind === 'double' || kind === 'triple' ? Number(raw.gap ?? MULTI_GAP) : 0;
+  const count = 1;
+  const gap = 0;
   const duration = kind === 'hold' ? Number(raw.duration) : 0;
-  if ((kind === 'double' || kind === 'triple') && (!Number.isFinite(gap) || gap <= 0)) {
-    throw new Error(`Invalid repeat ${index + 1}: gap must be greater than zero.`);
-  }
   if (kind === 'hold' && (!Number.isFinite(duration) || duration <= 0)) {
     throw new Error(`Invalid hold ${index + 1}: duration must be greater than zero.`);
   }
@@ -1060,6 +1205,7 @@ function updateStats() {
   document.getElementById('progress').style.width = `${progress}%`;
   document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', completed);
   document.querySelector('[role="progressbar"]').setAttribute('aria-valuemax', notes.length);
+  renderRequirements();
 }
 
 function showFeedback(title, copy, kind) {
@@ -1074,14 +1220,15 @@ function completeNote(note, diff) {
   stats.reactions.push(diff);
   const perfect = diff < PERFECT;
   createHitBurst(noteLanes(note), perfect, note.kind === 'chord' ? 1.15 : 1);
-  const patternMultiplier = note.kind === 'triple' || note.kind === 'chord' ? 2 : note.kind === 'double' || note.kind === 'hold' ? 1.5 : 1;
+  const patternMultiplier = note.kind === 'chord' ? 2 : note.kind === 'hold' ? 1.5 : 1;
   const streakMultiplier = Math.min(4, 1 + Math.floor((combo + 1) / 10));
   const points = Math.round((perfect ? 100 : 50) * patternMultiplier * streakMultiplier);
   if (perfect) stats.perfect++;
   else stats.good++;
   score += points;
   msg = perfect ? 'PERFECT' : 'GOOD';
-  showFeedback(perfect ? 'Perfect!' : 'Good hit!', `${note.kind === 'chord' ? `${noteLanes(note).length}-lane chord` : note.kind === 'hold' ? 'Hold complete' : note.kind === 'double' || note.kind === 'triple' ? `${note.count}-tap combo` : 'Dead on the beat'} · +${points} points`, 'good');
+  const hitLabel = note.kind === 'chord' ? `${noteLanes(note).length}-lane chord` : note.kind === 'hold' ? 'Hold complete' : 'Dead on the beat';
+  showFeedback(perfect ? 'Perfect!' : 'Good hit!', `${hitLabel} +${points} points`, 'good');
   combo++;
   maxCombo = Math.max(maxCombo, combo);
   updateStats();
@@ -1098,15 +1245,20 @@ function missNote(note) {
 }
 
 function currentTarget(note) {
-  return note.time + (note.kind === 'double' || note.kind === 'triple' ? note.progress * (note.gap || MULTI_GAP) : 0);
+  return note.time;
 }
 
 function keyDown(lane, now = gameTime()) {
+  if (paused || performance.now() < inputBlockedUntil) return;
   if (!difficultySelected || lane >= activeLaneCount || finished || held[lane]) return;
   held[lane] = true;
   downAt[lane] = now;
 
-  const hold = notes.find(n => !n.done && n.kind === 'hold' && !n.started && n.lane === lane && Math.abs(n.time - now) <= GOOD);
+  const closest = (predicate) => notes
+    .filter(predicate)
+    .sort((a, b) => Math.abs(currentTarget(a) - now) - Math.abs(currentTarget(b) - now))[0];
+
+  const hold = closest(n => n.kind === 'hold' && !n.done && !n.started && n.lane === lane && Math.abs(n.time - now) <= GOOD);
   if (hold) {
     hold.started = true;
     hold.startedAt = now;
@@ -1115,26 +1267,13 @@ function keyDown(lane, now = gameTime()) {
     return;
   }
 
-  const repeated = notes.find(n => !n.done && (n.kind === 'double' || n.kind === 'triple') && n.lane === lane && Math.abs(currentTarget(n) - now) <= GOOD);
-  if (repeated) {
-    repeated.hitDiffs.push(Math.abs(currentTarget(repeated) - now));
-    repeated.progress++;
-    if (repeated.progress === repeated.count) {
-      completeNote(repeated, repeated.hitDiffs.reduce((sum, diff) => sum + diff, 0) / repeated.hitDiffs.length);
-    } else {
-      createHitBurst([lane], Math.abs(currentTarget(repeated) - now) < PERFECT, .55);
-      showFeedback(`${repeated.count - repeated.progress} more!`, `Keep tapping ${keyNames[lane]} on the beat.`, 'ready');
-    }
-    return;
-  }
-
-  const tap = notes.find(n => !n.done && n.kind === 'tap' && n.lane === lane && Math.abs(n.time - now) <= GOOD);
+  const tap = closest(n => !n.done && n.kind === 'tap' && n.lane === lane && Math.abs(n.time - now) <= GOOD);
   if (tap) {
     completeNote(tap, Math.abs(tap.time - now));
     return;
   }
 
-  const chord = notes.find(n => !n.done && n.kind === 'chord' && Math.abs(n.time - now) <= GOOD);
+  const chord = closest(n => !n.done && n.kind === 'chord' && Math.abs(n.time - now) <= GOOD);
   if (chord) {
     const chordLanes = noteLanes(chord);
     if (!chordLanes.every(chordLane => held[chordLane])) return;
@@ -1149,7 +1288,7 @@ function keyUp(lane, now = gameTime()) {
   if (!held[lane]) return;
   held[lane] = false;
   downAt[lane] = null;
-  if (finished) return;
+  if (finished || paused) return;
   const hold = notes.find(n => !n.done && n.kind === 'hold' && n.started && n.lane === lane);
   if (!hold) return;
   const heldFor = now - hold.startedAt;
@@ -1159,6 +1298,33 @@ function keyUp(lane, now = gameTime()) {
   } else {
     missNote(hold);
   }
+}
+
+// ESP32 switches can still produce a short up/down burst after the firmware
+// debounce. Delay controller releases briefly so that a bounce cannot become
+// a second tap.
+const CONTROLLER_DEBOUNCE_MS = 70;
+const controllerPressed = [false, false, false, false];
+const controllerReleaseTimers = [null, null, null, null];
+function controllerDown(lane) {
+  if (!Number.isInteger(lane) || lane < 0 || lane >= 4) return;
+  if (controllerReleaseTimers[lane] !== null) {
+    clearTimeout(controllerReleaseTimers[lane]);
+    controllerReleaseTimers[lane] = null;
+  }
+  if (controllerPressed[lane]) return;
+  controllerPressed[lane] = true;
+  keyDown(lane);
+}
+function controllerUp(lane) {
+  if (!Number.isInteger(lane) || lane < 0 || lane >= 4 || !controllerPressed[lane]) return;
+  if (controllerReleaseTimers[lane] !== null) return;
+  controllerReleaseTimers[lane] = setTimeout(() => {
+    controllerReleaseTimers[lane] = null;
+    if (!controllerPressed[lane]) return;
+    controllerPressed[lane] = false;
+    keyUp(lane);
+  }, CONTROLLER_DEBOUNCE_MS);
 }
 
 const ws = new WebSocket('ws://' + location.host);
@@ -1177,11 +1343,8 @@ ws.onerror = () => {
 ws.onmessage = e => {
   try {
     const input = JSON.parse(e.data);
-    if (input.type === 'up') keyUp(input.lane);
-    else {
-      keyDown(input.lane);
-      if (input.type !== 'down') keyUp(input.lane);
-    }
+    if (input.type === 'down') controllerDown(Number(input.lane));
+    else if (input.type === 'up') controllerUp(Number(input.lane));
   } catch (_) {}
 };
 
@@ -1238,6 +1401,11 @@ difficultyOptions.forEach(option => {
 });
 
 function resetGame() {
+  clearInterval(countdownTimer);
+  countdownTimer = null;
+  paused = false;
+  hideOverlay();
+  applyRoundConfig(roundConfig());
   score = 0;
   combo = 0;
   maxCombo = 0;
@@ -1248,9 +1416,11 @@ function resetGame() {
   stats.miss = 0;
   stats.reactions.length = 0;
   if (!chartLoaded) {
-    sourceNotes.forEach((note, index) => { note.time = LEAD_IN + index * (60 / chartBpm); });
+    sourceNotes = createDefaultNotes(roundConfig());
     if (difficultySelected) applyDifficulty();
     else notes = sourceNotes;
+  } else if (difficultySelected) {
+    applyDifficulty();
   }
   notes.forEach((note, index) => {
     note.progress = 0;
@@ -1264,7 +1434,9 @@ function resetGame() {
   downAt.fill(null);
   hitEffects.length = 0;
   t0 = performance.now();
+  inputBlockedUntil = performance.now() + 150;
   updateStats();
+  updateRoundUI();
 }
 
 function updateSongControls() {
@@ -1329,7 +1501,7 @@ songBpm.addEventListener('change', () => {
 });
 
 songToggle.addEventListener('click', async () => {
-  if (!songAudio.src || !chartLoaded) return;
+  if (!songAudio.src || !chartLoaded || paused) return;
   if (finished || songAudio.ended) {
     songAudio.currentTime = 0;
     resetGame();
@@ -1369,7 +1541,10 @@ function finish() {
     missRate: total ? stats.miss / total : 0,
     maxCombo, score, ...stats
   };
-  showFeedback('Track complete!', `Final score: ${score.toLocaleString()} points`, 'good');
+  const outcome = evaluateRound();
+  Object.assign(result, { round: currentRound, passed: outcome.passed, aiTier: outcome.ai.label });
+  showFeedback(outcome.passed ? 'Round complete!' : 'Round not cleared', `Final score: ${score.toLocaleString()} points`, outcome.passed ? 'good' : 'miss');
+  showRoundResult(outcome);
   fetch('/api/results', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(result) });
 }
 
@@ -1573,7 +1748,7 @@ function drawPerspectiveGame(now) {
       }
     } else {
       const x = laneCenterAt(n.lane, y);
-      const label = n.kind === 'hold' ? 'H' : n.kind === 'double' || n.kind === 'triple' ? `x${n.count}` : '';
+      const label = n.kind === 'hold' ? 'H' : '';
       drawGem(x, y, Math.max(9, (n.kind === 'hold' ? 13 : 14) * visualScale), colors[n.lane], label);
     }
   }
@@ -1581,6 +1756,7 @@ function drawPerspectiveGame(now) {
 */
 
 function loop() {
+  updateGameButtons();
   const now = gameTime();
   const currentLaneWidth = laneWidth();
   ctx.clearRect(0, 0, 400, 600);
@@ -1698,7 +1874,7 @@ function loop() {
     ctx.fillStyle = '#11100f';
     ctx.font = 'bold 9px Segoe UI, sans-serif';
     ctx.textAlign = 'center';
-    const label = n.kind === 'chord' ? (noteLanes(n).length === 4 ? 'ALL 4' : 'CHORD') : n.kind === 'hold' ? 'H' : n.kind === 'double' || n.kind === 'triple' ? `×${n.count}` : '';
+    const label = n.kind === 'chord' ? (noteLanes(n).length === 4 ? 'ALL 4' : 'CHORD') : n.kind === 'hold' ? 'H' : '';
     if (label) {
       const labelX = n.kind === 'chord'
         ? (Math.min(...noteLanes(n)) * currentLaneWidth + currentLaneWidth / 2 + Math.max(...noteLanes(n)) * currentLaneWidth + currentLaneWidth / 2) / 2
@@ -1711,7 +1887,248 @@ function loop() {
   if (!finished && notes.every(n => n.done)) finish();
   requestAnimationFrame(loop);
 }
+
+// ===== Pause, restart, round flow, AI coach =====
+const pauseBtn = document.getElementById('pause-btn');
+const restartBtn = document.getElementById('restart-btn');
+const roundSelect = document.getElementById('round-select');
+const overlay = document.getElementById('round-overlay');
+const overlayCard = document.getElementById('overlay-card');
+const reqList = document.getElementById('req-list');
+const DIFF_NAMES = { 2: 'Easy', 3: 'Medium', 4: 'Hard' };
+let pausedAudio = false;
+
+function canPause() {
+  return difficultySelected && !finished && !paused && (!(songMode && chartLoaded) || !songAudio.paused);
+}
+function updateGameButtons() {
+  pauseBtn.disabled = !canPause();
+  restartBtn.disabled = !difficultySelected;
+}
+function showOverlay(html) { overlayCard.innerHTML = html; overlay.hidden = false; }
+function hideOverlay() { overlay.hidden = true; overlayCard.innerHTML = ''; }
+
+function pauseGame() {
+  if (!canPause()) return;
+  frozenTime = gameTime();           // capture before flipping the flag
+  pauseStartedAt = performance.now();
+  paused = true;
+  pausedAudio = songMode && chartLoaded && !songAudio.paused;
+  if (pausedAudio) songAudio.pause();
+  showOverlay(`<p class="ov-kicker">Round ${currentRound} · ${DIFF_NAMES[activeLaneCount]}</p>
+    <h2 class="ov-title">Paused</h2>
+    <p class="ov-copy">Song, notes, timer and score are stopped. Controller and keyboard hits are ignored until you resume.</p>
+    <div class="ov-actions">
+      <button class="game-btn ov-btn-main" data-action="resume" type="button">Resume</button>
+      <button class="game-btn" data-action="restart" type="button">Restart</button>
+    </div>`);
+}
+
+function resumeGame() {
+  if (!paused || countdownTimer) return;
+  let n = 3;
+  const draw = () => showOverlay(`<div class="ov-count">${n}</div><p class="ov-copy">Get ready. The round continues exactly where it stopped.</p>`);
+  draw();
+  countdownTimer = setInterval(() => {
+    n--;
+    if (n > 0) { draw(); return; }
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+    continueGame();
+  }, 500);
+}
+
+function continueGame() {
+  t0 += performance.now() - pauseStartedAt;   // wall-clock mode picks up at the frozen time
+  paused = false;
+  hideOverlay();
+  // A sustain the player let go of while paused can no longer be completed.
+  notes.forEach(n => { if (!n.done && n.kind === 'hold' && n.started && !held[n.lane]) missNote(n); });
+  showFeedback('Back in!', 'Keep the rhythm going.', 'ready');
+  if (pausedAudio) {
+    pausedAudio = false;
+    songAudio.play().then(() => { songToggle.textContent = 'Pause song'; })
+      .catch(() => showFeedback('Press Play song', 'The browser blocked audio. Press Play song to continue.', 'miss'));
+  }
+}
+
+function restartRound() {
+  resetGame();                       // score, streak, stats, notes, held keys, overlays, timers
+  if (songMode && chartLoaded) {
+    songAudio.pause();
+    songAudio.currentTime = 0;
+    songAudio.play().then(() => { songToggle.textContent = 'Pause song'; })
+      .catch(() => showFeedback('Press Play song', 'Press Play song to start this round.', 'ready'));
+  }
+  showFeedback(`Round ${currentRound}`, 'Fresh start: score, streak and accuracy were reset.', 'ready');
+}
+
+function nextRound() {
+  if (currentRound < MAX_ROUND && currentRound < progress.unlocked) currentRound++;
+  restartRound();
+}
+
+function roundRequirements(total = notes.length, round = currentRound) {
+  const step = Math.floor((round - 1) / 3);
+  return {
+    accuracy: Math.min(90, REQUIRE.accuracy + step * 2),
+    hitRate: Math.min(85, REQUIRE.hitRate + step * 2),
+    score: Math.round(REQUIRE.score * clamp(total / 48, 0.25, 2.5) * (1 + 0.08 * (round - 1)) / 100) * 100
+  };
+}
+
+function renderRequirements() {
+  const total = notes.length;
+  const completed = stats.perfect + stats.good + stats.miss;
+  const hits = stats.perfect + stats.good;
+  const req = roundRequirements(total);
+  const acc = completed ? Math.round(hits / completed * 100) : null;
+  const rate = total ? Math.round(hits / total * 100) : 0;
+  const rows = [
+    [`Accuracy ≥ ${req.accuracy}%`, acc === null ? '—' : `${acc}%`, acc === null ? '' : acc >= req.accuracy ? 'ok' : 'bad'],
+    [`Score ≥ ${req.score.toLocaleString()}`, score.toLocaleString(), score >= req.score ? 'ok' : ''],
+    [`Note hits ≥ ${req.hitRate}%`, `${rate}%`, rate >= req.hitRate ? 'ok' : '']
+  ];
+  reqList.innerHTML = rows.map(r => `<li class="${r[2]}"><span>${r[0]}</span><b>${r[1]}</b></li>`).join('');
+}
+
+function renderAiBox() {
+  const ai = progress.lastAi;
+  document.getElementById('ai-tier').textContent = ai ? `AI coach · ${ai.tier}` : 'AI coach';
+  document.getElementById('ai-copy').textContent = ai ? ai.text : 'Finish a round and the coach will check your accuracy, reaction time and streaks, then tune the next round.';
+}
+
+function updateRoundUI() {
+  roundSelect.innerHTML = '';
+  for (let i = 1; i <= progress.unlocked; i++) {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = i;
+    roundSelect.appendChild(option);
+  }
+  roundSelect.value = currentRound;
+  document.getElementById('round-max').textContent = MAX_ROUND;
+  document.getElementById('round-label').textContent = `Round ${currentRound} of ${MAX_ROUND}`;
+  document.getElementById('round-unlocked').textContent = `Unlocked ${progress.unlocked} / ${MAX_ROUND}`;
+  document.getElementById('round-dots').innerHTML = Array.from({ length: MAX_ROUND }, (_, i) =>
+    `<span class="${i + 1 <= progress.cleared ? 'done' : ''} ${i + 1 === currentRound ? 'cur' : ''}"></span>`).join('');
+  renderRequirements();
+  renderAiBox();
+}
+
+// ---- AI performance model (runs locally in the browser) ----
+function analyzePerformance(m) {
+  const acc = m.total ? m.hits / m.total : 0;
+  const perfectRate = m.hits ? m.perfect / m.hits : 0;
+  const comboRatio = m.total ? Math.min(1, m.maxCombo / m.total) : 0;
+  const timing = clamp(1 - (m.avgMs - 30) / 120, 0, 1);            // 30 ms avg error = great, 150 ms = poor
+  const missScore = 1 - clamp((m.misses / Math.max(1, m.total)) * 3, 0, 1);
+  const skill = Math.round(100 * (0.38 * acc + 0.2 * perfectRate + 0.17 * comboRatio + 0.15 * timing + 0.1 * missScore));
+  const rawLevel = skill >= 80 ? 1 : skill >= 58 ? 0 : -1;
+  const level = m.passed ? rawLevel : Math.min(rawLevel, 0);     // never get harder after a failed round
+  const label = level < 0 ? 'Beginner' : level > 0 ? 'Advanced' : 'Intermediate';
+
+  let opener;
+  if (level < 0) opener = `You missed ${m.misses} of ${m.total} notes, so the next round slows the notes by 12%, uses about 20% fewer of them and gives a wider timing window.`;
+  else if (level > 0) opener = `Strong control: ${Math.round(acc * 100)}% accuracy and a ${m.maxCombo}-note streak. Next round: 10% faster notes, denser and trickier patterns, tighter timing.`;
+  else opener = `Steady run at ${Math.round(acc * 100)}% accuracy. The next round keeps the normal difficulty curve.`;
+
+  const deficits = [
+    [0.55 - timing, `Your hits land about ${Math.round(m.avgMs)} ms away from the beat on average. Watch the strike line instead of the note.`],
+    [0.35 - comboRatio, `Your streak keeps breaking (best ${m.maxCombo}). Aim for clean hits first; speed comes after.`],
+    [0.4 - perfectRate, `Only ${Math.round(perfectRate * 100)}% of your hits were Perfect. Press right as the note touches the line.`]
+  ].sort((a, b) => b[0] - a[0]);
+  const tip = deficits[0][0] > 0 ? deficits[0][1] : 'Timing, streaks and precision are all solid. Keep it up!';
+  return { skill, level, label, text: `${opener} ${tip}` };
+}
+
+function evaluateRound() {
+  const total = notes.length;
+  const completed = stats.perfect + stats.good + stats.miss;
+  const hits = stats.perfect + stats.good;
+  const misses = stats.miss + Math.max(0, total - completed);      // unplayed notes count as misses
+  const accuracy = completed ? Math.round(hits / completed * 100) : 0;
+  const hitRate = total ? Math.round(hits / total * 100) : 0;
+  const req = roundRequirements(total);
+  const checks = [
+    { label: `Accuracy ≥ ${req.accuracy}%`, value: `${accuracy}%`, ok: accuracy >= req.accuracy },
+    { label: `Score ≥ ${req.score.toLocaleString()}`, value: score.toLocaleString(), ok: score >= req.score },
+    { label: `Note hits ≥ ${req.hitRate}%`, value: `${hitRate}%`, ok: hitRate >= req.hitRate }
+  ];
+  const passed = total > 0 && checks.every(c => c.ok);
+  const avgMs = stats.reactions.length ? stats.reactions.reduce((a, b) => a + b, 0) / stats.reactions.length * 1000 : 0;
+  const ai = analyzePerformance({ total, hits, perfect: stats.perfect, good: stats.good, misses, maxCombo, avgMs, passed });
+  return { passed, checks, accuracy, misses, ai, total, hits };
+}
+
+function showRoundResult(o) {
+  const prev = progress.best[currentRound] || { score: 0, accuracy: 0 };
+  progress.best[currentRound] = { score: Math.max(prev.score, score), accuracy: Math.max(prev.accuracy, o.accuracy) };
+  progress.plays++;
+  progress.aiLevel = o.ai.level;
+  progress.lastAi = { tier: o.ai.label, text: o.ai.text };
+  if (o.passed) {
+    progress.cleared = Math.max(progress.cleared, currentRound);
+    progress.unlocked = Math.min(MAX_ROUND, progress.cleared + 1);
+  }
+  saveProgress();
+  const clear = o.passed && currentRound >= MAX_ROUND;
+  const title = clear ? 'Campaign clear' : o.passed ? 'Round complete' : 'Round failed';
+  const copy = clear ? 'You cleared all 10 rounds!' : o.passed ? `Round ${currentRound + 1} unlocked.` : 'Meet every requirement below to unlock the next round.';
+  const rows = o.checks.map(c => `<li class="${c.ok ? 'ok' : 'bad'}"><span>${c.ok ? '✓' : '✗'} ${c.label}</span><b>${c.value}</b></li>`).join('');
+  const buttons = o.passed
+    ? (clear ? '' : '<button class="game-btn ov-btn-main" data-action="next" type="button">Next round</button>') +
+      `<button class="game-btn${clear ? ' ov-btn-main' : ''}" data-action="again" type="button">${clear ? 'Play again' : 'Replay'}</button>`
+    : '<button class="game-btn ov-btn-main" data-action="again" type="button">Try again</button>';
+  showOverlay(`<p class="ov-kicker">Round ${currentRound} of ${MAX_ROUND} · ${DIFF_NAMES[activeLaneCount]}</p>
+    <h2 class="ov-title ${o.passed ? 'win' : 'lose'}">${title}</h2>
+    <p class="ov-copy" style="margin-bottom:0">${copy}</p>
+    <div class="ov-stats">
+      <div><span>Score</span><strong>${score.toLocaleString()}</strong></div>
+      <div><span>Accuracy</span><strong>${o.accuracy}%</strong></div>
+      <div><span>Misses</span><strong>${o.misses}</strong></div>
+      <div><span>Perfect</span><strong>${stats.perfect}</strong></div>
+      <div><span>Good</span><strong>${stats.good}</strong></div>
+      <div><span>Max combo</span><strong>${maxCombo}</strong></div>
+    </div>
+    <ul class="ov-reqs">${rows}</ul>
+    <div class="ov-ai"><b>AI coach · ${o.ai.label} (skill ${o.ai.skill}/100)</b><span>${o.ai.text}</span></div>
+    <div class="ov-actions">${buttons}</div>`);
+  updateRoundUI();
+}
+
+pauseBtn.addEventListener('click', e => { e.currentTarget.blur(); pauseGame(); });
+restartBtn.addEventListener('click', e => { e.currentTarget.blur(); if (difficultySelected) restartRound(); });
+roundSelect.addEventListener('change', () => {
+  currentRound = clamp(Number(roundSelect.value) || 1, 1, progress.unlocked);
+  roundSelect.blur();
+  restartRound();
+});
+document.getElementById('reset-progress').addEventListener('click', () => {
+  if (!confirm('Reset all saved rounds and progress?')) return;
+  Object.assign(progress, { cleared: 0, unlocked: 1, best: {}, aiLevel: 0, plays: 0, lastAi: null });
+  saveProgress();
+  currentRound = 1;
+  restartRound();
+});
+overlay.addEventListener('click', e => {
+  const button = e.target.closest('[data-action]');
+  if (!button) return;
+  const action = button.dataset.action;
+  if (action === 'resume') resumeGame();
+  else if (action === 'restart' || action === 'again') restartRound();
+  else if (action === 'next') nextRound();
+});
+addEventListener('keydown', e => {
+  if (e.repeat || /^(INPUT|SELECT|TEXTAREA)$/.test((e.target && e.target.tagName) || '')) return;
+  const key = e.key.toLowerCase();
+  if (key === 'p' || key === 'escape') {
+    if (paused) resumeGame();
+    else pauseGame();
+  }
+});
 updateStats();
+updateRoundUI();
 loop();
 </script>
 </body>

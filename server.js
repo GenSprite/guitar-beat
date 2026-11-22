@@ -1,10 +1,11 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const { WebSocketServer } = require('ws');
 
 const app = express();
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Receives end-of-song stats (hook up MySQL / Python ML here later)
 app.post('/api/results', (req, res) => {
@@ -25,3 +26,5 @@ wss.on('connection', ws => {
 });
 
 server.listen(3000, '0.0.0.0', () => console.log('Game: http://localhost:3000'));
+
+module.exports = server;

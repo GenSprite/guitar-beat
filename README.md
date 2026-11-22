@@ -17,11 +17,10 @@ PC and ESP32 must be on the same Wi-Fi. Allow Node.js through Windows Firewall (
 ## Gameplay
 Play the four-lane fret highway by matching each note to its lane as it reaches the strike line. The four buttons act as fret-and-strum controls, so press the matching key/button on the beat:
 - Plain lane notes: press the matching key once.
-- `×2` / `×3`: tap that lane two or three times to the beat.
 - `HOLD`: press and keep the lane button down until the bar finishes.
 - `ALL 4`: press D, F, J, and K together.
 
-Build a streak to increase the score multiplier, up to 4x. The keyboard supports all patterns. For ESP32 holds, upload the current sketch so it sends both button-down and button-up events.
+Build a streak to increase the score multiplier, up to 4x. The keyboard supports tap, hold and chord patterns. For ESP32 holds, upload the current sketch so it sends both button-down and button-up events.
 
 At startup, choose a difficulty: **Easy** uses 2 lanes (D/F), **Medium** uses 3 lanes (D/F/J), and **Hard** uses all 4 lanes (D/F/J/K). Higher-lane notes are removed or simplified for easier modes while preserving the song timing.
 
@@ -40,13 +39,19 @@ Chart format:
   "notes": [
     { "time": 2.315, "kind": "tap", "lane": 0 },
     { "time": 3.020, "kind": "hold", "lane": 2, "duration": 0.850 },
-    { "time": 4.125, "kind": "chord", "lanes": [0, 2] },
-    { "time": 5.000, "kind": "double", "lane": 1, "gap": 0.220 }
+    { "time": 4.125, "kind": "chord", "lanes": [0, 2] }
   ]
 }
 ```
 
 `lane` values map to D/F/J/K as 0/1/2/3. Use `lanes` for a chord, `duration` for a hold, and `gap` for the spacing between repeated taps.
+
+## Rounds, pause, restart and AI coach
+
+- **Pause** (button, `P` or `Esc`): freezes the song, notes, timer and score and ignores all hits (keyboard, touch and ESP32). **Resume** counts down 3-2-1 and continues exactly where it stopped. **Restart** (also in the pause menu) resets score, streak, accuracy, misses, inputs, chart and song to the start.
+- **Rounds 1-10**: clear a round to unlock the next one. Default requirements (they scale with note count and round): accuracy 80%, score 5,000 (for a 48-note chart), and at least 70% of notes hit. Misses are still tracked in the results and AI coach but do not block progression. Progress and best scores are saved in `localStorage` (key `guitarBeat.progress.v1`); use *Reset saved progress* in the side panel to start over.
+- **Per-round difficulty**: faster notes (up to 1.6x), tighter Good/Perfect windows, and for the built-in practice chart more notes plus more HOLD, DOUBLE, TRIPLE and CHORD patterns. For a loaded song chart the note timestamps are never changed (exact sync), so rounds there use speed and timing windows, and the AI can remove some plain taps for beginners.
+- **AI coach**: after every round a local model scores accuracy, average reaction error, Perfect/Good ratio, streak consistency and misses, rates the player Beginner / Intermediate / Advanced, writes feedback, and tunes the next round (-12% speed and -20% notes, normal, or +10% speed with trickier patterns). It runs in the browser; `POST /api/results` also receives `round`, `passed` and `aiTier` for the future scikit-learn model.
 
 ## Next
 - POST /api/results already receives end-of-song stats -> save to MySQL
