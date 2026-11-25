@@ -1,20 +1,15 @@
 {
   "name": "guitar-beat",
-  "version": "1.0.0",
-  "description": "GUITAR-BEAT: ESP32 rhythm game with desktop app",
-  "main": "main.js",
-  "author": "GUITAR-BEAT Team",
+  "version": "1.1.0",
+  "description": "GUITAR-BEAT: ESP32 rhythm game with browser UI, Python AI progression and SQLite records",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "app": "electron .",
-    "dist": "electron-builder"
+    "backend": "python backend/app.py",
+    "test": "python -m unittest discover -s backend/tests -v"
   },
-  "dependencies": { "express": "^4.19.2", "ws": "^8.17.0" },
-  "devDependencies": { "electron": "^33.0.0", "electron-builder": "^25.1.8" },
-  "build": {
-    "appId": "com.guitarbeat.app",
-    "productName": "GUITAR-BEAT",
-    "files": ["main.js", "server.js", "public/**/*", "package.json"],
-    "win": { "target": "nsis" }
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.17.0"
   }
 }

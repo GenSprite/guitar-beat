@@ -7,10 +7,11 @@ Buttons: GPIO 13, 12, 14, 27 -> GND (INPUT_PULLUP, no resistor needed)
 Optional LEDs: GPIO 26, 25, 33, 32 (220 ohm each) | Buzzer: GPIO 15
 
 ## Run
-1. `npm install`
-2. `npm start`  -> open http://localhost:3000 (test with keys D F J K)
-3. Arduino IDE: install "esp32 by Espressif" board + "WebSockets" (Markus Sattler) library.
-4. Open esp32_guitar_beat/esp32_guitar_beat.ino, edit ssid / pass / host (PC IP), upload.
+1. Install Node.js and Python 3.8+ (Python needs **no extra packages** - it only uses the standard library).
+2. `npm install`
+3. `npm start`  -> open http://localhost:3000 (test with keys D F J K). This also starts the Python backend automatically.
+4. Arduino IDE: install "esp32 by Espressif" board + "WebSockets" (Markus Sattler) library.
+5. Open esp32_guitar_beat/esp32_guitar_beat.ino, edit ssid / pass / host (PC IP), upload.
 
 PC and ESP32 must be on the same Wi-Fi. Allow Node.js through Windows Firewall (private network).
 
@@ -22,7 +23,7 @@ Play the four-lane fret highway by matching each note to its lane as it reaches 
 
 Build a streak to increase the score multiplier, up to 4x. The keyboard supports tap, hold and chord patterns. For ESP32 holds, upload the current sketch so it sends both button-down and button-up events.
 
-At startup, choose a difficulty: **Easy** uses 2 lanes (D/F), **Medium** uses 3 lanes (D/F/J), and **Hard** uses all 4 lanes (D/F/J/K). Higher-lane notes are removed or simplified for easier modes while preserving the song timing.
+After loading the song and matching chart, choose a starting difficulty: **Easy** starts with 2 lanes (D/F), **Medium** starts with 3 lanes (D/F/J), and **Hard** starts with all 4 lanes (D/F/J/K). Each successful song level adds another active lane up to 4; speed and timing windows continue getting stricter through the later levels.
 
 ## Song mode and exact guitar charts
 
@@ -44,15 +45,26 @@ Chart format:
 }
 ```
 
-`lane` values map to D/F/J/K as 0/1/2/3. Use `lanes` for a chord, `duration` for a hold, and `gap` for the spacing between repeated taps.
+`lane` values map to D/F/J/K as 0/1/2/3. Use `lanes` for a chord and `duration` for a hold.
 
-## Rounds, pause, restart and AI coach
+## AI progression + SQLite records (new)
 
-- **Pause** (button, `P` or `Esc`): freezes the song, notes, timer and score and ignores all hits (keyboard, touch and ESP32). **Resume** counts down 3-2-1 and continues exactly where it stopped. **Restart** (also in the pause menu) resets score, streak, accuracy, misses, inputs, chart and song to the start.
-- **Rounds 1-10**: clear a round to unlock the next one. Default requirements (they scale with note count and round): accuracy 80%, score 5,000 (for a 48-note chart), and at least 70% of notes hit. Misses are still tracked in the results and AI coach but do not block progression. Progress and best scores are saved in `localStorage` (key `guitarBeat.progress.v1`); use *Reset saved progress* in the side panel to start over.
-- **Per-round difficulty**: faster notes (up to 1.6x), tighter Good/Perfect windows, and for the built-in practice chart more notes plus more HOLD, DOUBLE, TRIPLE and CHORD patterns. For a loaded song chart the note timestamps are never changed (exact sync), so rounds there use speed and timing windows, and the AI can remove some plain taps for beginners.
-- **AI coach**: after every round a local model scores accuracy, average reaction error, Perfect/Good ratio, streak consistency and misses, rates the player Beginner / Intermediate / Advanced, writes feedback, and tunes the next round (-12% speed and -20% notes, normal, or +10% speed with trickier patterns). It runs in the browser; `POST /api/results` also receives `round`, `passed` and `aiTier` for the future scikit-learn model.
+```
+browser (index.html) --/api/game/*--> Node server (proxy) --> Python backend (backend/app.py) --> data/guitar_beat.db
+```
+
+- **Levels:** An uploaded song + matching chart starts a 5-level adaptive progression for that song. Easy progresses 2 → 3 → 4 lanes, Medium progresses 3 → 4 lanes, and Hard begins at 4 lanes. The uploaded song keeps its exact chart timestamps; the AI increases note speed and timing pressure at every later level. Failed runs repeat the current song level.
+- **Completion %** (computed by `backend/ai_engine.py`): Accuracy 60 + Perfect timing 15 + Streak 15 + Special notes (HOLD/chord) 10. It updates live while you play.
+- **Rules:** 0-69.9% Failed (next level locked, retry) · 70-99.9% Passed (next level unlocks) · 100% Perfect (unlocks + perfect score recorded).
+- **AI coach:** live tips during the run and personalised feedback afterwards (weak note types, weak lanes, early/late habit, progress vs your last attempt). It is a rule-based analysis engine - no internet or API key needed.
+- **Database:** `data/guitar_beat.db` is created automatically. Tables: `players`, `level_progress`, `song_progress`, and `attempts` (full score history with song title, song level and date/time). Existing databases are upgraded automatically. The in-game **Leaderboard** ranks saved runs from all players by score; **Player records** show the current player's history; **Database tables** opens a read-only viewer for the raw local SQLite tables.
+- **Data use:** Before creating or selecting a player, the profile dialog requires agreement that the name and gameplay data are used only for scoring, progression, AI feedback and this school project. Records stay in the local SQLite database.
+- **Resilience:** if Python/SQLite is unavailable an uploaded song can still be played without saving; if a save fails the result is still shown and the song remains playable.
+
+Useful commands:
+- `npm run backend` - run the Python backend on its own (then start Node with `GUITAR_BEAT_NO_PYTHON=1`)
+- `npm test` - run the backend tests (70% rule, AI engine, SQLite, HTTP API)
+- Environment: `PYTHON` (interpreter), `GUITAR_BEAT_PY_PORT` (default 5001), `GUITAR_BEAT_DB` (database path)
 
 ## Next
-- POST /api/results already receives end-of-song stats -> save to MySQL
-- Train scikit-learn model, predict skill level, adjust SPEED / note density
+- Train a scikit-learn model on the `details` JSON stored with every attempt to predict skill level and adjust SPEED / note density

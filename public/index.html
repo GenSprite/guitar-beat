@@ -430,44 +430,160 @@
     .side-panel .panel:first-child { grid-column: auto; }
     .footer { flex-direction: column; gap: 7px; }
   }
-  /* ===== Pause / restart / rounds / AI coach ===== */
-  .game-actions { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; width: min(100%, 400px); margin: 0 auto 10px; }
-  .round-chip { display: inline-flex; align-items: center; gap: 6px; margin-right: auto; padding: 5px 9px; border: 1px solid rgba(239, 41, 37, .4); color: #ff7770; font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
-  .round-chip select { padding: 2px 3px; border: 1px solid rgba(240, 229, 205, .25); border-radius: 2px; color: var(--paper); background: #26221e; font: inherit; font-size: 10px; }
-  .game-btn { min-height: 30px; padding: 0 12px; border: 1px solid rgba(239, 41, 37, .55); border-radius: 2px; color: var(--paper); background: rgba(239, 41, 37, .12); cursor: pointer; font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
-  .game-btn:hover:not(:disabled), .game-btn:focus-visible:not(:disabled) { background: rgba(239, 41, 37, .3); outline: none; }
-  .game-btn:disabled { cursor: not-allowed; opacity: .4; }
-  .ov-btn-main { background: var(--red); border-color: var(--red); }
-  .ov-btn-main:hover:not(:disabled), .ov-btn-main:focus-visible:not(:disabled) { background: #ff4a45; }
-  .overlay { position: absolute; z-index: 5; inset: 0; display: grid; place-items: center; padding: 12px; overflow-y: auto; background: rgba(8, 7, 6, .84); backdrop-filter: blur(3px); }
+
+  /* ===== Progression system (Python AI + SQLite) ===== */
+  .top-right { display: flex; align-items: center; gap: 10px; }
+  .player-chip {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 34px; max-width: 190px; padding: 0 12px;
+    border: 1px solid var(--line); border-radius: 999px; color: var(--paper); background: transparent;
+    cursor: pointer; font-size: 11px; font-weight: 800; letter-spacing: .04em;
+  }
+  .player-chip:hover, .player-chip:focus-visible { border-color: var(--red); outline: none; }
+  .player-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .player-chip small { color: var(--paper-dim); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+
+  .screen-wrap { position: relative; }
+  .overlay {
+    position: absolute; z-index: 5; inset: 0; display: grid; place-items: center; padding: 14px;
+    background: rgba(8, 7, 6, .84); backdrop-filter: blur(3px);
+  }
   .overlay[hidden] { display: none; }
-  .ov-card { width: 100%; padding: 16px 14px; border: 1px solid rgba(240, 229, 205, .28); border-top: 3px solid var(--red); background: linear-gradient(145deg, rgba(239, 41, 37, .12), transparent 55%), #181614; text-align: center; }
-  .ov-kicker { margin: 0 0 6px; color: var(--red); font-size: 9px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; }
-  .ov-title { margin: 0; color: var(--paper); font-family: Impact, "Arial Narrow", sans-serif; font-size: 32px; letter-spacing: .03em; text-transform: uppercase; }
-  .ov-title.win { color: #acd585; }
-  .ov-title.lose { color: #f07867; }
-  .ov-copy { margin: 8px 0 14px; color: var(--paper-dim); font-size: 11px; line-height: 1.5; }
-  .ov-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; }
-  .ov-stats div { padding: 8px 4px; border: 1px solid var(--line); background: rgba(0, 0, 0, .2); }
-  .ov-stats span { display: block; color: #9c9385; font-size: 8px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-  .ov-stats strong { display: block; margin-top: 4px; color: var(--paper); font-size: 16px; }
-  .ov-reqs, .req-list { margin: 0 0 12px; padding: 0; list-style: none; }
-  .ov-reqs li, .req-list li { display: flex; justify-content: space-between; gap: 8px; padding: 5px 2px; border-bottom: 1px solid var(--line); color: var(--paper-dim); font-size: 10px; text-align: left; }
-  .ov-reqs li.ok, .req-list li.ok { color: #acd585; }
-  .ov-reqs li.bad, .req-list li.bad { color: #f07867; }
-  .ov-ai, .ai-box { display: grid; gap: 4px; margin: 0 0 12px; padding: 9px 10px; border-left: 3px solid #53b8ef; background: rgba(83, 184, 239, .08); color: var(--paper-dim); font-size: 10px; line-height: 1.5; text-align: left; }
-  .ov-ai b, .ai-box strong { color: var(--paper); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
-  .ov-actions { display: flex; gap: 8px; }
-  .ov-actions .game-btn { flex: 1; min-height: 38px; }
-  .ov-count { color: var(--red); font-family: Impact, "Arial Narrow", sans-serif; font-size: 96px; line-height: 1; text-shadow: 3px 3px 0 var(--red-dark); }
-  .round-head { display: flex; justify-content: space-between; gap: 8px; color: var(--paper); font-size: 12px; font-weight: 800; }
-  .round-head span { color: #9c9385; font-size: 10px; letter-spacing: .06em; }
-  .round-dots { display: flex; gap: 4px; margin: 10px 0 12px; }
-  .round-dots span { flex: 1; height: 6px; background: #37312b; }
-  .round-dots span.done { background: #9fca76; }
-  .round-dots span.cur { background: var(--red); }
-  .link-btn { margin-top: 2px; padding: 0; border: 0; color: #766e62; background: none; cursor: pointer; font-size: 9px; letter-spacing: .1em; text-decoration: underline; text-transform: uppercase; }
-  .link-btn:hover { color: var(--paper-dim); }
+  .overlay.light { background: rgba(8, 7, 6, .55); pointer-events: none; }
+  .pause-card { text-align: center; }
+  .pause-card strong { display: block; font-family: Impact, "Arial Narrow", sans-serif; font-size: 40px; letter-spacing: .08em; text-transform: uppercase; }
+  .pause-card span { color: var(--paper-dim); font-size: 11px; }
+  .result-card {
+    width: min(100%, 340px); padding: 18px 18px 16px; text-align: center;
+    border: 1px solid rgba(240, 229, 205, .28); border-top: 3px solid var(--red);
+    background: #181614; box-shadow: 0 16px 50px rgba(0, 0, 0, .6);
+  }
+  .result-card[data-state="PASSED"] { border-top-color: #9fca76; }
+  .result-card[data-state="PERFECT"] { border-top-color: #f4d34e; }
+  .result-kicker { margin: 0 0 6px; color: var(--paper-dim); font-size: 10px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+  .result-title { margin: 0; font-family: Impact, "Arial Narrow", sans-serif; font-size: 28px; letter-spacing: .04em; text-transform: uppercase; }
+  .result-card[data-state="FAILED"] .result-title { color: #f07867; }
+  .result-card[data-state="PASSED"] .result-title { color: #acd585; }
+  .result-card[data-state="PERFECT"] .result-title { color: #f4d34e; }
+  .result-pct { margin: 4px 0 2px; font-family: Impact, "Arial Narrow", sans-serif; font-size: 58px; line-height: 1; letter-spacing: .02em; }
+  .result-sub { margin: 8px 0 4px; color: var(--paper-dim); font-size: 12px; line-height: 1.5; }
+  .result-badge { display: inline-block; margin: 2px 0 6px; padding: 3px 8px; border: 1px solid #f4d34e; color: #f4d34e; font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+  .result-badge[hidden] { display: none; }
+  .result-save { margin: 0 0 12px; color: #8f8779; font-size: 10px; }
+  .result-save[data-kind="warn"] { color: #e6a544; }
+  .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .btn {
+    min-height: 34px; padding: 0 10px; border: 1px solid rgba(240, 229, 205, .28); border-radius: 2px;
+    color: var(--paper); background: #26221e; cursor: pointer;
+    font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase;
+  }
+  .btn:hover:not(:disabled), .btn:focus-visible:not(:disabled) { border-color: var(--red); background: rgba(239, 41, 37, .18); outline: none; }
+  .btn.primary { border-color: rgba(239, 41, 37, .6); background: rgba(239, 41, 37, .18); }
+  .btn.primary:hover:not(:disabled) { background: rgba(239, 41, 37, .36); }
+  .btn.unlocked { border-color: #9fca76; background: rgba(159, 202, 118, .16); }
+  .btn.unlocked:hover:not(:disabled) { background: rgba(159, 202, 118, .3); }
+  .btn:disabled { cursor: not-allowed; opacity: .45; }
+  .link-btn { padding: 0; border: 0; color: var(--paper-dim); background: none; cursor: pointer; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-decoration: underline; text-underline-offset: 3px; text-transform: uppercase; }
+  .link-btn:hover, .link-btn:focus-visible { color: var(--paper); outline: none; }
+  .link-btn[hidden] { display: none; }
+
+  .level-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .level-no { display: block; font-family: Impact, "Arial Narrow", sans-serif; font-size: 22px; letter-spacing: .05em; text-transform: uppercase; }
+  .level-name { display: block; margin-top: 2px; color: var(--paper-dim); font-size: 11px; }
+  .level-status { padding: 4px 8px; border: 1px solid var(--line); color: var(--paper-dim); font-size: 9px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; }
+  .level-status[data-state="PASSED"] { color: #acd585; border-color: rgba(172, 213, 133, .45); }
+  .level-status[data-state="PERFECT"] { color: #f4d34e; border-color: rgba(244, 211, 78, .5); }
+  .level-status[data-state="FAILED"] { color: #f07867; border-color: rgba(240, 120, 103, .45); }
+  .comp-row { display: flex; align-items: baseline; justify-content: space-between; color: #9c9385; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .comp-row strong { color: var(--paper); font-family: Impact, "Arial Narrow", sans-serif; font-size: 30px; font-weight: 400; letter-spacing: .03em; }
+  .comp-track { position: relative; height: 9px; margin: 6px 0 20px; background: #37312b; }
+  .comp-fill { width: 0; height: 100%; background: linear-gradient(90deg, var(--red-dark), var(--red)); transition: width .25s ease, background .25s; }
+  .comp-track[data-pass="true"] .comp-fill { background: linear-gradient(90deg, #5f8f43, #9fca76); }
+  .comp-mark { position: absolute; top: -4px; bottom: -4px; left: 70%; width: 2px; background: var(--paper); }
+  .comp-mark span { position: absolute; top: 100%; left: 50%; margin-top: 2px; color: var(--paper-dim); font-size: 9px; font-weight: 900; transform: translateX(-50%); }
+  .comp-note { margin: 0 0 14px; min-height: 30px; color: var(--paper-dim); font-size: 11px; line-height: 1.45; }
+  .level-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .chip {
+    min-width: 38px; height: 32px; padding: 0 8px; border: 1px solid rgba(240, 229, 205, .25); border-radius: 2px;
+    color: var(--paper); background: #26221e; cursor: pointer; font-size: 12px; font-weight: 900;
+  }
+  .chip:hover:not(:disabled), .chip:focus-visible:not(:disabled) { border-color: var(--red); outline: none; }
+  .chip[data-state="done"] { color: #acd585; border-color: rgba(172, 213, 133, .5); }
+  .chip[data-state="perfect"] { color: #f4d34e; border-color: rgba(244, 211, 78, .6); }
+  .chip[data-state="locked"] { color: #6c6559; cursor: not-allowed; opacity: .6; }
+  .chip[data-current="true"] { background: rgba(239, 41, 37, .3); border-color: var(--red); }
+  .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .panel-links { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; }
+
+  .coach-head { margin-bottom: 6px; color: var(--paper); font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+  .coach-text { margin: 0; color: var(--paper-dim); font-size: 12px; line-height: 1.55; }
+  .coach-list { display: grid; gap: 9px; margin: 12px 0 0; padding: 0; list-style: none; }
+  .coach-list li { padding: 8px 10px; border-left: 3px solid var(--red); background: rgba(239, 41, 37, .07); color: var(--paper-dim); font-size: 11px; line-height: 1.5; }
+  .coach-list li.good { border-color: #9fca76; background: rgba(159, 202, 118, .07); }
+  .coach-list strong { display: block; margin-bottom: 2px; color: var(--paper); font-size: 11px; letter-spacing: .04em; }
+  .breakdown { display: grid; gap: 7px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .breakdown[hidden] { display: none; }
+  .breakdown-row { display: grid; grid-template-columns: 96px 1fr 52px; align-items: center; gap: 8px; color: #9c9385; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .breakdown-row .bar { height: 5px; background: #37312b; }
+  .breakdown-row .bar i { display: block; height: 100%; background: var(--red); }
+  .breakdown-row b { color: var(--paper); text-align: right; font-weight: 800; }
+  .offline-note { margin: 0 0 10px; padding: 8px 10px; border-left: 3px solid #e6a544; background: rgba(230, 165, 68, .08); color: #e6c58c; font-size: 11px; line-height: 1.45; }
+  .offline-note[hidden] { display: none; }
+
+  .profile-modal { z-index: 12; }
+  .profile-terms { margin: 12px 0 14px; padding: 10px 11px; border: 1px solid rgba(240, 229, 205, .2); border-left: 3px solid var(--red); background: rgba(239, 41, 37, .06); }
+  .profile-terms h3 { margin: 0 0 5px; color: var(--paper); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+  .profile-terms p { margin: 0 0 8px; color: var(--paper-dim); font-size: 10px; line-height: 1.5; }
+  .profile-consent { display: flex; align-items: flex-start; gap: 7px; color: var(--paper); cursor: pointer; font-size: 10px; font-weight: 800; line-height: 1.4; }
+  .profile-consent input { flex: 0 0 auto; margin-top: 1px; accent-color: var(--red); }
+  .profile-list { display: grid; gap: 7px; max-height: 210px; margin-bottom: 14px; overflow-y: auto; }
+  .profile-list:empty { display: none; }
+  .profile-pick {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px;
+    border: 1px solid rgba(240, 229, 205, .22); border-radius: 2px; color: var(--paper); background: #26221e; cursor: pointer; text-align: left;
+  }
+  .profile-pick:hover, .profile-pick:focus-visible { border-color: var(--red); background: rgba(239, 41, 37, .18); outline: none; }
+  .profile-pick:disabled { cursor: not-allowed; opacity: .45; }
+  .profile-pick strong { font-size: 13px; letter-spacing: .04em; }
+  .profile-pick span { color: #9c9385; font-size: 10px; text-align: right; }
+  .profile-pick.recent { border-color: rgba(239, 41, 37, .6); }
+  .profile-form { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .profile-form input {
+    min-width: 0; min-height: 36px; padding: 0 10px; border: 1px solid rgba(240, 229, 205, .25); border-radius: 2px;
+    color: var(--paper); background: #11100f; font: inherit; font-size: 13px;
+  }
+  .profile-form input:focus { border-color: var(--red); outline: none; }
+  .profile-form input:disabled { cursor: not-allowed; opacity: .55; }
+  .profile-error { min-height: 16px; margin: 8px 0 0; color: #f18a7f; font-size: 11px; }
+  .profile-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .profile-actions[hidden] { display: none; }
+
+  .records-card { width: min(100%, 720px); max-height: calc(100vh - 40px); overflow-y: auto; }
+  .records-head { display: flex; align-items: start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .records-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 18px; }
+  .records-sub { margin: 16px 0 8px; color: var(--paper-dim); font-size: 10px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; }
+  .table-wrap { max-height: 230px; overflow: auto; border: 1px solid var(--line); }
+  .records-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .records-table th { position: sticky; top: 0; padding: 7px 8px; background: #26221e; color: #9c9385; font-size: 9px; letter-spacing: .12em; text-align: left; text-transform: uppercase; white-space: nowrap; }
+  .records-table td { padding: 7px 8px; border-top: 1px solid var(--line); color: var(--paper-dim); white-space: nowrap; }
+  .records-table tr:hover td { background: rgba(255, 255, 255, .03); }
+  .tag { padding: 2px 6px; border: 1px solid var(--line); font-size: 9px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+  .tag.PASSED { color: #acd585; border-color: rgba(172, 213, 133, .45); }
+  .tag.PERFECT { color: #f4d34e; border-color: rgba(244, 211, 78, .5); }
+  .tag.FAILED { color: #f07867; border-color: rgba(240, 120, 103, .45); }
+  .empty-row { padding: 16px; color: #8f8779; font-size: 11px; text-align: center; }
+  .database-tabs { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 12px; }
+  .database-card { width: min(100%, 980px); }
+  .database-tab { padding: 7px 9px; border: 1px solid var(--line); color: var(--paper-dim); background: #26221e; cursor: pointer; font-size: 10px; }
+  .database-tab:hover, .database-tab:focus-visible, .database-tab[data-current="true"] { border-color: var(--red); color: var(--paper); outline: none; }
+  .database-status { min-height: 18px; margin: 0 0 8px; color: var(--paper-dim); font-size: 10px; }
+  @media (max-width: 460px) {
+    .top-right { gap: 6px; }
+    .player-chip { max-width: 120px; padding: 0 9px; }
+    .player-chip small { display: none; }
+    .breakdown-row { grid-template-columns: 82px 1fr 46px; }
+  }
+  .profile-form[hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -478,9 +594,12 @@
       <div class="brand-name">Guitar <span>Beat</span></div>
     </div>
     <div class="top-tag">ESP32 · Rhythm arcade</div>
-    <div class="connection" id="status" data-state="connecting" role="status" aria-live="polite">
-      <span class="connection-dot" aria-hidden="true"></span>
-      <span id="status-text">Connecting to game server</span>
+    <div class="top-right">
+      <button class="player-chip" id="player-chip" type="button" title="Switch player"><small>Player</small><span id="player-chip-name">Offline</span></button>
+      <div class="connection" id="status" data-state="connecting" role="status" aria-live="polite">
+        <span class="connection-dot" aria-hidden="true"></span>
+        <span id="status-text">Connecting to game server</span>
+      </div>
     </div>
   </header>
 
@@ -496,18 +615,26 @@
     <section class="arcade" aria-label="Rhythm game">
       <div class="cabinet">
         <div class="cabinet-head">
-          <div class="track-label">Now playing<strong>Electric riff / Track 01</strong></div>
+          <div class="track-label">Now playing<strong id="track-title">Upload a song + chart</strong></div>
           <div class="playing">Live session</div>
-        </div>
-        <div class="game-actions">
-          <label class="round-chip" id="round-chip">Round <select id="round-select" aria-label="Choose an unlocked round"></select> / <span id="round-max">10</span></label>
-          <button class="game-btn" id="pause-btn" type="button" disabled>&#10074;&#10074; Pause</button>
-          <button class="game-btn" id="restart-btn" type="button" disabled>&#8635; Restart</button>
         </div>
         <div class="screen-wrap">
           <canvas id="c" width="400" height="600" aria-label="Rhythm game playfield"></canvas>
-          <div class="overlay" id="round-overlay" role="dialog" aria-modal="true" aria-live="polite" hidden>
-            <div class="ov-card" id="overlay-card"></div>
+          <div class="overlay light" id="pause-overlay" hidden><div class="pause-card"><strong>Paused</strong><span>Press Resume to continue</span></div></div>
+          <div class="overlay" id="result-overlay" hidden role="dialog" aria-live="polite" aria-labelledby="result-title">
+            <div class="result-card" id="result-card" data-state="FAILED">
+              <p class="result-kicker" id="result-kicker">Level 1</p>
+              <h3 class="result-title" id="result-title">Level failed</h3>
+              <div class="result-pct" id="result-pct">0%</div>
+              <p class="result-sub" id="result-sub"></p>
+              <span class="result-badge" id="result-badge" hidden></span>
+              <p class="result-save" id="result-save"></p>
+              <div class="result-actions">
+                <button class="btn" id="result-retry" type="button" disabled>Retry</button>
+                <button class="btn primary" id="result-next" type="button" disabled>🔒 Next level</button>
+              </div>
+              <button class="link-btn" id="result-save-again" type="button" hidden style="margin-top:10px">Try again</button>
+            </div>
           </div>
         </div>
         <div class="song-controls" aria-label="Song player">
@@ -543,18 +670,46 @@
           </div>
         </section>
 
+        <section class="panel" id="level-panel" aria-label="Level progress">
+          <h2 class="panel-title">Level progress</h2>
+          <p class="offline-note" id="offline-note" hidden></p>
+          <div class="level-head">
+            <div><span class="level-no" id="level-no">Classic mode</span><span class="level-name" id="level-name">-</span></div>
+            <span class="level-status" id="level-status" data-state="">-</span>
+          </div>
+          <div class="comp-row"><span>Completion</span><strong id="comp-pct">0.0%</strong></div>
+          <div class="comp-track" id="comp-bar" role="progressbar" aria-label="Completion percentage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-pass="false">
+            <div class="comp-fill" id="comp-fill"></div>
+            <div class="comp-mark" title="70% to pass"><span>70%</span></div>
+          </div>
+          <p class="comp-note" id="comp-note"></p>
+          <div class="level-chips" id="level-chips" aria-label="Levels"></div>
+          <div class="btn-grid">
+            <button class="btn" id="btn-pause" type="button" disabled>Pause</button>
+            <button class="btn" id="btn-restart" type="button">Restart</button>
+            <button class="btn" id="btn-retry" type="button" disabled>Retry</button>
+            <button class="btn primary" id="btn-next" type="button" disabled>🔒 Next level</button>
+          </div>
+          <div class="panel-links">
+            <button class="link-btn" id="btn-records" type="button">Player records</button>
+            <button class="link-btn" id="btn-leaderboard" type="button">Leaderboard</button>
+            <button class="link-btn" id="btn-database" type="button">Database tables</button>
+            <button class="link-btn" id="btn-difficulty" type="button">Change difficulty</button>
+            <button class="link-btn" id="btn-back-levels" type="button" hidden>Unload song</button>
+          </div>
+        </section>
+
         <div class="feedback" id="feedback" data-kind="ready" aria-live="polite">
           <div class="feedback-icon" aria-hidden="true">♪</div>
-          <div class="feedback-copy"><strong id="feedback-title">Get ready</strong><span id="feedback-copy">First notes are on their way.</span></div>
+          <div class="feedback-copy"><strong id="feedback-title">Song required</strong><span id="feedback-copy">Load an audio file and matching guitar chart to begin.</span></div>
         </div>
 
-        <section class="panel" aria-label="Round progression">
-          <h2 class="panel-title">Round progress</h2>
-          <div class="round-head"><strong id="round-label">Round 1 of 10</strong><span id="round-unlocked">Unlocked 1 / 10</span></div>
-          <div class="round-dots" id="round-dots" aria-hidden="true"></div>
-          <ul class="req-list" id="req-list" aria-label="Requirements to clear this round"></ul>
-          <div class="ai-box" id="ai-box"><strong id="ai-tier">AI coach</strong><span id="ai-copy">Finish a round and the coach will check your accuracy, reaction time and streaks, then tune the next round.</span></div>
-          <button class="link-btn" id="reset-progress" type="button">Reset saved progress</button>
+        <section class="panel" id="coach-panel" aria-label="AI coach" aria-live="polite">
+          <h2 class="panel-title">AI coach</h2>
+          <div class="coach-head" id="coach-title">AI coach is offline</div>
+          <p class="coach-text" id="coach-text"></p>
+          <ul class="coach-list" id="coach-list"></ul>
+          <div class="breakdown" id="coach-breakdown" hidden></div>
         </section>
 
         <section class="panel">
@@ -563,7 +718,6 @@
             <div class="control-item"><span>Fret + strum</span><div class="key-group" aria-label="D F J K keys"><kbd>D</kbd><kbd>F</kbd><kbd>J</kbd><kbd>K</kbd></div></div>
             <div class="control-item"><span>Difficulty</span><strong id="difficulty-label" style="color:var(--paper);font-size:11px">Choose at start</strong></div>
             <div class="control-item"><span>Controller</span><strong style="color:var(--paper);font-size:11px">ESP32 ready</strong></div>
-            <div class="control-item"><span>Pause</span><div class="key-group"><kbd>P</kbd><kbd>Esc</kbd></div></div>
           </div>
           <p class="controller-note"><strong>Fret + strum:</strong> press the matching key as its gem reaches the line. <strong>Hold:</strong> keep the button down to the end of the tail. <strong>Chord:</strong> press all four together.</p>
         </section>
@@ -573,16 +727,74 @@
     <footer class="footer"><span>Guitar Beat — Find your rhythm</span><span>Made for the ones who play loud</span></footer>
   </main>
 </div>
-<div class="difficulty-modal" id="difficulty-modal" role="dialog" aria-modal="true" aria-labelledby="difficulty-title">
+<div class="difficulty-modal" id="difficulty-modal" role="dialog" aria-modal="true" aria-labelledby="difficulty-title" hidden>
   <div class="difficulty-card">
     <p class="difficulty-kicker">Choose your run</p>
     <h2 id="difficulty-title">How many lanes?</h2>
-    <p class="difficulty-copy">Pick a difficulty before playing. Easier modes simplify chords and remove notes from the higher lanes while keeping the song timing intact.</p>
+    <p class="difficulty-copy">Pick a starting difficulty. You can change it later; changing difficulty restarts the current song so the score and notes stay consistent.</p>
     <div class="difficulty-options">
       <button class="difficulty-option" type="button" data-lanes="2"><strong>Easy</strong><span>2 lanes · D / F</span></button>
       <button class="difficulty-option" type="button" data-lanes="3"><strong>Medium</strong><span>3 lanes · D / F / J</span></button>
       <button class="difficulty-option" type="button" data-lanes="4"><strong>Hard</strong><span>4 lanes · D / F / J / K</span></button>
     </div>
+    <button class="link-btn" id="difficulty-cancel" type="button" hidden style="margin-top:14px">Keep current difficulty</button>
+  </div>
+</div>
+<div class="difficulty-modal profile-modal" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+  <div class="difficulty-card">
+    <p class="difficulty-kicker">Player profile</p>
+    <h2 id="profile-title">Who's playing?</h2>
+    <p class="difficulty-copy" id="profile-copy">Connecting to the Python backend…</p>
+    <div class="profile-terms" id="profile-terms">
+      <h3>Data-use agreement</h3>
+      <p>GUITAR-BEAT uses your name and gameplay data—such as scores, accuracy, level progress and attempts—only for scoring, progression, AI feedback and this school project. Records are saved locally on this computer and are not sold or shared for unrelated purposes.</p>
+      <label class="profile-consent"><input id="profile-terms-check" type="checkbox"> <span>I have read and agree to this data-use agreement.</span></label>
+    </div>
+    <div class="profile-list" id="profile-list"></div>
+    <form class="profile-form" id="profile-form" autocomplete="off" hidden>
+      <input id="profile-name" type="text" maxlength="24" placeholder="New player name" aria-label="New player name" disabled>
+      <button class="btn primary" type="submit">Start</button>
+    </form>
+    <p class="profile-error" id="profile-error" role="alert"></p>
+    <div class="profile-actions" id="profile-actions" hidden>
+      <button class="btn" id="profile-retry" type="button">Retry connection</button>
+      <button class="btn primary" id="profile-offline-play" type="button">Continue without saving</button>
+    </div>
+    <button class="link-btn" id="profile-cancel" type="button" hidden style="margin-top:12px">Cancel</button>
+  </div>
+</div>
+<div class="difficulty-modal" id="records-modal" role="dialog" aria-modal="true" aria-labelledby="records-title" hidden>
+  <div class="difficulty-card records-card">
+    <div class="records-head">
+      <div><p class="difficulty-kicker">Player records</p><h2 id="records-title">Player</h2></div>
+      <button class="btn" id="records-close" type="button">Close</button>
+    </div>
+    <div class="records-stats" id="records-stats"></div>
+    <h3 class="records-sub">Level results</h3>
+    <div class="table-wrap"><table class="records-table" id="records-levels"></table></div>
+    <h3 class="records-sub">Attempt history</h3>
+    <div class="table-wrap"><table class="records-table" id="records-history"></table></div>
+  </div>
+</div>
+<div class="difficulty-modal" id="leaderboard-modal" role="dialog" aria-modal="true" aria-labelledby="leaderboard-title" hidden>
+  <div class="difficulty-card records-card">
+    <div class="records-head">
+      <div><p class="difficulty-kicker">All players · all runs</p><h2 id="leaderboard-title">Leaderboard</h2></div>
+      <button class="btn" id="leaderboard-close" type="button">Close</button>
+    </div>
+    <div class="table-wrap"><table class="records-table" id="leaderboard-table"></table></div>
+  </div>
+</div>
+<div class="difficulty-modal" id="database-modal" role="dialog" aria-modal="true" aria-labelledby="database-title" hidden>
+  <div class="difficulty-card records-card database-card">
+    <div class="records-head">
+      <div><p class="difficulty-kicker">Local SQLite · read only</p><h2 id="database-title">Backend tables</h2></div>
+      <button class="btn" id="database-close" type="button">Close</button>
+    </div>
+    <p class="difficulty-copy">These are the local tables used by the Python backend. Nothing can be edited or deleted here.</p>
+    <div class="database-tabs" id="database-tabs" aria-label="Database tables"></div>
+    <p class="database-status" id="database-status"></p>
+    <div class="table-wrap"><table class="records-table" id="database-table"></table></div>
   </div>
 </div>
 <script>
@@ -590,123 +802,25 @@ const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 // Faster highway scroll, similar to a Clone Hero-style note speed. This only
 // changes the visual travel rate; hit timing still follows the song clock.
-const HIT_Y = 520, BASE_SPEED = 540;
-let SPEED = BASE_SPEED;
+const HIT_Y = 520;
+let SPEED = 540;
 const colors = ['#75d66f', '#ef4545', '#f4d34e', '#53b8ef'];
-const BASE_PERFECT = 0.05, BASE_GOOD = 0.15;
-let PERFECT = BASE_PERFECT, GOOD = BASE_GOOD;
+let PERFECT = 0.05, GOOD = 0.15;
 const HIT_EFFECT_DURATION = 300;
-const CHORD_SPREAD = 0.16, HOLD_DURATION = 0.75;
+const MULTI_GAP = 0.22, CHORD_SPREAD = 0.16;
 let score = 0, combo = 0, maxCombo = 0, msg = '', finished = false;
 const stats = { perfect: 0, good: 0, miss: 0, reactions: [] };
-const LEAD_IN = 2;
 let chartBpm = 63;
 let t0 = performance.now();
 let activeLaneCount = 4;
 let difficultySelected = false;
+let songStartingLanes = 2;
+let paused = false, pauseStartedAt = 0, pausedClock = 0, songStarted = false;   // pause + song-run tracking
 
-// ===== Rounds: saved progress, per-round difficulty, AI adjustment =====
-const MAX_ROUND = 10;
-const STORE_KEY = 'guitarBeat.progress.v1';
-const REQUIRE = { accuracy: 80, score: 5000, hitRate: 70 };
-const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-function loadProgress() {
-  const fresh = { cleared: 0, unlocked: 1, best: {}, aiLevel: 0, plays: 0, lastAi: null };
-  try {
-    const p = JSON.parse(localStorage.getItem(STORE_KEY));
-    if (p && typeof p === 'object') {
-      const cleared = clamp(Math.floor(Number(p.cleared) || 0), 0, MAX_ROUND);
-      return {
-        cleared,
-        unlocked: Math.min(MAX_ROUND, cleared + 1),
-        best: p.best && typeof p.best === 'object' ? p.best : {},
-        aiLevel: clamp(Math.round(Number(p.aiLevel) || 0), -1, 1),
-        plays: Math.floor(Number(p.plays) || 0),
-        lastAi: p.lastAi || null
-      };
-    }
-  } catch (_) {}
-  return fresh;
-}
-function saveProgress() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(progress)); } catch (_) {}
-}
-const progress = loadProgress();
-let currentRound = progress.unlocked;
-let paused = false, frozenTime = 0, pauseStartedAt = 0, countdownTimer = null, inputBlockedUntil = 0;
-
-function mulberry32(seed) {
-  let a = seed | 0;
-  return function () {
-    a = (a + 0x6D2B79F5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-// Round 1 with a neutral AI level reproduces the original game exactly.
-// ai: -1 = beginner help, 0 = normal, +1 = advanced challenge.
-function roundConfig(round = currentRound, ai = progress.aiLevel) {
-  const g = round - 1;
-  const aiSpeed = [0.88, 1, 1.1][ai + 1];
-  const aiDensity = [0.8, 1, 1.12][ai + 1];
-  return {
-    round, ai,
-    speed: Math.round(BASE_SPEED * Math.min(1.6, 1 + 0.06 * g) * aiSpeed),
-    density: clamp((1 + 0.05 * g) * aiDensity, 0.7, 1.6),
-    complexity: clamp(g / 9 + ai * 0.12, 0, 1),
-    good: +clamp(BASE_GOOD - 0.006 * g + (ai < 0 ? 0.01 : ai > 0 ? -0.005 : 0), 0.1, 0.16).toFixed(3),
-    perfect: +clamp(BASE_PERFECT - 0.002 * g + (ai < 0 ? 0.005 : 0), 0.032, 0.055).toFixed(3)
-  };
-}
-function applyRoundConfig(cfg) {
-  SPEED = cfg.speed;
-  GOOD = cfg.good;
-  PERFECT = cfg.perfect;
-}
-
-const pattern = ['tap', 'tap', 'tap', 'tap', 'hold', 'tap', 'chord', 'tap'];
-const laneSequence = [0, 1, 2, 3, 2, 0, 1, 3, 1, 2, 0, 3, 0, 2, 3, 1];
-function createDefaultNotes(cfg = roundConfig()) {
-  // Same 48-beat song length at every round: higher density = more notes, closer together.
-  const beat = 60 / chartBpm;
-  const spacing = Math.max(0.5, beat / cfg.density);
-  const count = Math.round(48 * clamp(cfg.density, 0.75, 1.5));
-  const rand = mulberry32(cfg.round * 7919 + 13);
-  let prevLane = -1;
-  return Array.from({ length: count }, (_, i) => {
-    let kind = pattern[i % pattern.length];
-    let lane = laneSequence[i % laneSequence.length];
-    if (cfg.complexity > 0) {
-      if (kind === 'tap' && rand() < 0.5 * cfg.complexity) {
-        const r = rand();
-        kind = r < 0.7 ? 'hold' : 'chord';
-      }
-      if (rand() < 0.6 * cfg.complexity) lane = Math.floor(rand() * 4);
-      if (lane === prevLane) lane = (lane + 1 + Math.floor(rand() * 3)) % 4;
-    }
-    prevLane = lane;
-    return {
-      kind,
-      lane,
-      lanes: kind === 'chord' ? [0, 1, 2, 3] : null,
-      time: LEAD_IN + i * spacing,
-      count: 1,
-      gap: 0,
-      progress: 0,
-      hitDiffs: [],
-      duration: kind === 'hold' ? Math.min(HOLD_DURATION, Math.max(0.35, spacing * 0.9)) : 0,
-      started: false,
-      startedAt: 0,
-      startDiff: 0,
-      done: false
-    };
-  });
-}
-let sourceNotes = createDefaultNotes();
+// A run is unavailable until the player loads both an audio file and its
+// matching guitar chart.
+let sourceNotes = [];
 let notes = sourceNotes;
-applyRoundConfig(roundConfig());
 
 const status = document.getElementById('status');
 const statusText = document.getElementById('status-text');
@@ -725,6 +839,11 @@ songAudio.preload = 'auto';
 let songMode = false;
 let songObjectUrl = null;
 let chartLoaded = false;
+let loadedChartTitle = '';
+let loadedSongKey = '';
+let songLevel = 1;
+let songProgress = null;
+let songProgressRequest = 0;
 const keyNames = ['D', 'F', 'J', 'K'];
 const held = [false, false, false, false];
 const downAt = [null, null, null, null];
@@ -732,11 +851,10 @@ const hitEffects = [];
 
 function gameTime() {
   if (!difficultySelected) return 0;
-  if (paused) return frozenTime;
   // Exact charts wait at time zero until both their audio and chart are ready.
-  // The original built-in practice chart keeps its normal wall-clock mode.
   if (songMode && chartLoaded) return songAudio.currentTime;
   if (songMode || chartLoaded) return 0;
+  if (paused) return pausedClock;
   return (performance.now() - t0) / 1000;
 }
 
@@ -757,6 +875,49 @@ function cloneNote(note) {
   };
 }
 
+// Uploaded songs use the same chart timestamps at every level. The AI changes
+// the playable lanes, visual pressure and timing windows instead of changing
+// the song's audio sync.
+const SONG_LEVELS = [
+  { level: 1, name: 'Warm-Up', speed: 460, perfect: 0.075, good: 0.20 },
+  { level: 2, name: 'Groove', speed: 560, perfect: 0.060, good: 0.17 },
+  { level: 3, name: 'Rhythm Run', speed: 600, perfect: 0.050, good: 0.15 },
+  { level: 4, name: 'Fast Fingers', speed: 650, perfect: 0.045, good: 0.13 },
+  { level: 5, name: 'Full Shred', speed: 720, perfect: 0.035, good: 0.10 }
+];
+
+function songLevelInfo(levelNumber) {
+  return SONG_LEVELS.find(level => level.level === levelNumber) || SONG_LEVELS[0];
+}
+
+function songLevelLanes(levelNumber) {
+  return Math.min(4, Math.max(2, songStartingLanes + Number(levelNumber) - 1));
+}
+
+function restoreDefaultTiming() {
+  SPEED = 540;
+  PERFECT = 0.05;
+  GOOD = 0.15;
+}
+
+function setSongLevel(levelNumber, shouldReset = true) {
+  const level = songLevelInfo(Math.max(1, Math.min(SONG_LEVELS.length, Number(levelNumber) || 1)));
+  songLevel = level.level;
+  activeLaneCount = songLevelLanes(level.level);
+  SPEED = level.speed;
+  PERFECT = level.perfect;
+  GOOD = level.good;
+  if (difficultySelected && chartLoaded) applyDifficulty();
+  if (difficultySelected) difficultyLabel.textContent = `Song Level ${level.level} · ${activeLaneCount} lanes`;
+  if (shouldReset && isSongRun()) {
+    songAudio.pause();
+    songAudio.currentTime = 0;
+    songToggle.textContent = 'Play song';
+  }
+  if (shouldReset && difficultySelected) resetGame();
+  refreshModeUI();
+}
+
 function applyDifficulty() {
   const maxLane = activeLaneCount - 1;
   const filtered = [];
@@ -773,18 +934,7 @@ function applyDifficulty() {
       filtered.push(cloneNote(sourceNote));
     }
   }
-  let result = filtered;
-  const cfg = roundConfig();
-  if (chartLoaded && cfg.density < 1) {
-    let acc = 0;
-    result = filtered.filter(n => {
-      if (n.kind !== 'tap') return true;
-      acc += cfg.density;
-      if (acc >= 1) { acc -= 1; return true; }
-      return false;
-    });
-  }
-  notes = result;
+  notes = filtered;
 }
 
 function noteLanes(note) {
@@ -792,8 +942,8 @@ function noteLanes(note) {
 }
 
 function normalizeChartNote(raw, index) {
-  const rawKind = raw && ['tap', 'double', 'triple', 'hold', 'chord'].includes(raw.kind) ? raw.kind : null;
-  const kind = rawKind === 'double' || rawKind === 'triple' ? 'tap' : rawKind;
+  const kinds = ['tap', 'double', 'triple', 'hold', 'chord'];
+  const kind = raw && kinds.includes(raw.kind) ? raw.kind : null;
   const time = Number(raw && raw.time);
   if (!kind || !Number.isFinite(time) || time < 0) {
     throw new Error(`Invalid note ${index + 1}: kind and non-negative time are required.`);
@@ -813,9 +963,12 @@ function normalizeChartNote(raw, index) {
     throw new Error(`Invalid note ${index + 1}: lane must be between 0 and 3.`);
   }
 
-  const count = 1;
-  const gap = 0;
+  const count = kind === 'double' ? 2 : kind === 'triple' ? 3 : 1;
+  const gap = kind === 'double' || kind === 'triple' ? Number(raw.gap ?? MULTI_GAP) : 0;
   const duration = kind === 'hold' ? Number(raw.duration) : 0;
+  if ((kind === 'double' || kind === 'triple') && (!Number.isFinite(gap) || gap <= 0)) {
+    throw new Error(`Invalid repeat ${index + 1}: gap must be greater than zero.`);
+  }
   if (kind === 'hold' && (!Number.isFinite(duration) || duration <= 0)) {
     throw new Error(`Invalid hold ${index + 1}: duration must be greater than zero.`);
   }
@@ -1067,11 +1220,16 @@ function loadChart(data) {
   }
   const loadedNotes = data.notes
     .map(normalizeChartNote)
+    .filter(note => note.kind !== 'double' && note.kind !== 'triple')
     .sort((a, b) => a.time - b.time);
+  if (!loadedNotes.length) {
+    throw new Error('The chart must contain at least one tap, hold, or chord note.');
+  }
   sourceNotes = loadedNotes;
   if (difficultySelected) applyDifficulty();
   else notes = sourceNotes;
   chartLoaded = true;
+  loadedChartTitle = typeof data.title === 'string' ? data.title.trim() : '';
   const metadataBpm = Number(data.bpm);
   if (Number.isFinite(metadataBpm) && metadataBpm >= 40 && metadataBpm <= 240) {
     chartBpm = Math.round(metadataBpm);
@@ -1205,7 +1363,7 @@ function updateStats() {
   document.getElementById('progress').style.width = `${progress}%`;
   document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', completed);
   document.querySelector('[role="progressbar"]').setAttribute('aria-valuemax', notes.length);
-  renderRequirements();
+  onStatsChanged();
 }
 
 function showFeedback(title, copy, kind) {
@@ -1220,15 +1378,14 @@ function completeNote(note, diff) {
   stats.reactions.push(diff);
   const perfect = diff < PERFECT;
   createHitBurst(noteLanes(note), perfect, note.kind === 'chord' ? 1.15 : 1);
-  const patternMultiplier = note.kind === 'chord' ? 2 : note.kind === 'hold' ? 1.5 : 1;
+  const patternMultiplier = note.kind === 'triple' || note.kind === 'chord' ? 2 : note.kind === 'double' || note.kind === 'hold' ? 1.5 : 1;
   const streakMultiplier = Math.min(4, 1 + Math.floor((combo + 1) / 10));
   const points = Math.round((perfect ? 100 : 50) * patternMultiplier * streakMultiplier);
   if (perfect) stats.perfect++;
   else stats.good++;
   score += points;
   msg = perfect ? 'PERFECT' : 'GOOD';
-  const hitLabel = note.kind === 'chord' ? `${noteLanes(note).length}-lane chord` : note.kind === 'hold' ? 'Hold complete' : 'Dead on the beat';
-  showFeedback(perfect ? 'Perfect!' : 'Good hit!', `${hitLabel} +${points} points`, 'good');
+  showFeedback(perfect ? 'Perfect!' : 'Good hit!', `${note.kind === 'chord' ? `${noteLanes(note).length}-lane chord` : note.kind === 'hold' ? 'Hold complete' : note.kind === 'double' || note.kind === 'triple' ? `${note.count}-tap combo` : 'Dead on the beat'} · +${points} points`, 'good');
   combo++;
   maxCombo = Math.max(maxCombo, combo);
   updateStats();
@@ -1238,6 +1395,7 @@ function missNote(note) {
   if (note.done) return;
   note.done = true;
   stats.miss++;
+  trackMiss(note);
   combo = 0;
   msg = 'MISS';
   showFeedback('Missed it', 'Reset your streak and catch the next pattern.', 'miss');
@@ -1245,35 +1403,46 @@ function missNote(note) {
 }
 
 function currentTarget(note) {
-  return note.time;
+  return note.time + (note.kind === 'double' || note.kind === 'triple' ? note.progress * (note.gap || MULTI_GAP) : 0);
 }
 
 function keyDown(lane, now = gameTime()) {
-  if (paused || performance.now() < inputBlockedUntil) return;
-  if (!difficultySelected || lane >= activeLaneCount || finished || held[lane]) return;
+  if (!difficultySelected || !isSongRun() || lane >= activeLaneCount || finished || isPaused() || held[lane]) return;
   held[lane] = true;
   downAt[lane] = now;
 
-  const closest = (predicate) => notes
-    .filter(predicate)
-    .sort((a, b) => Math.abs(currentTarget(a) - now) - Math.abs(currentTarget(b) - now))[0];
-
-  const hold = closest(n => n.kind === 'hold' && !n.done && !n.started && n.lane === lane && Math.abs(n.time - now) <= GOOD);
+  const hold = notes.find(n => !n.done && n.kind === 'hold' && !n.started && n.lane === lane && Math.abs(n.time - now) <= GOOD);
   if (hold) {
     hold.started = true;
     hold.startedAt = now;
     hold.startDiff = Math.abs(hold.time - now);
+    trackHit(now - hold.time);
     showFeedback('Hold it!', 'Keep the key pressed until the note bar ends.', 'ready');
     return;
   }
 
-  const tap = closest(n => !n.done && n.kind === 'tap' && n.lane === lane && Math.abs(n.time - now) <= GOOD);
+  const repeated = notes.find(n => !n.done && (n.kind === 'double' || n.kind === 'triple') && n.lane === lane && Math.abs(currentTarget(n) - now) <= GOOD);
+  if (repeated) {
+    trackHit(now - currentTarget(repeated));
+    repeated.hitDiffs.push(Math.abs(currentTarget(repeated) - now));
+    repeated.progress++;
+    if (repeated.progress === repeated.count) {
+      completeNote(repeated, repeated.hitDiffs.reduce((sum, diff) => sum + diff, 0) / repeated.hitDiffs.length);
+    } else {
+      createHitBurst([lane], Math.abs(currentTarget(repeated) - now) < PERFECT, .55);
+      showFeedback(`${repeated.count - repeated.progress} more!`, `Keep tapping ${keyNames[lane]} on the beat.`, 'ready');
+    }
+    return;
+  }
+
+  const tap = notes.find(n => !n.done && n.kind === 'tap' && n.lane === lane && Math.abs(n.time - now) <= GOOD);
   if (tap) {
+    trackHit(now - tap.time);
     completeNote(tap, Math.abs(tap.time - now));
     return;
   }
 
-  const chord = closest(n => !n.done && n.kind === 'chord' && Math.abs(n.time - now) <= GOOD);
+  const chord = notes.find(n => !n.done && n.kind === 'chord' && Math.abs(n.time - now) <= GOOD);
   if (chord) {
     const chordLanes = noteLanes(chord);
     if (!chordLanes.every(chordLane => held[chordLane])) return;
@@ -1288,7 +1457,7 @@ function keyUp(lane, now = gameTime()) {
   if (!held[lane]) return;
   held[lane] = false;
   downAt[lane] = null;
-  if (finished || paused) return;
+  if (finished || isPaused()) return;
   const hold = notes.find(n => !n.done && n.kind === 'hold' && n.started && n.lane === lane);
   if (!hold) return;
   const heldFor = now - hold.startedAt;
@@ -1298,33 +1467,6 @@ function keyUp(lane, now = gameTime()) {
   } else {
     missNote(hold);
   }
-}
-
-// ESP32 switches can still produce a short up/down burst after the firmware
-// debounce. Delay controller releases briefly so that a bounce cannot become
-// a second tap.
-const CONTROLLER_DEBOUNCE_MS = 70;
-const controllerPressed = [false, false, false, false];
-const controllerReleaseTimers = [null, null, null, null];
-function controllerDown(lane) {
-  if (!Number.isInteger(lane) || lane < 0 || lane >= 4) return;
-  if (controllerReleaseTimers[lane] !== null) {
-    clearTimeout(controllerReleaseTimers[lane]);
-    controllerReleaseTimers[lane] = null;
-  }
-  if (controllerPressed[lane]) return;
-  controllerPressed[lane] = true;
-  keyDown(lane);
-}
-function controllerUp(lane) {
-  if (!Number.isInteger(lane) || lane < 0 || lane >= 4 || !controllerPressed[lane]) return;
-  if (controllerReleaseTimers[lane] !== null) return;
-  controllerReleaseTimers[lane] = setTimeout(() => {
-    controllerReleaseTimers[lane] = null;
-    if (!controllerPressed[lane]) return;
-    controllerPressed[lane] = false;
-    keyUp(lane);
-  }, CONTROLLER_DEBOUNCE_MS);
 }
 
 const ws = new WebSocket('ws://' + location.host);
@@ -1343,13 +1485,17 @@ ws.onerror = () => {
 ws.onmessage = e => {
   try {
     const input = JSON.parse(e.data);
-    if (input.type === 'down') controllerDown(Number(input.lane));
-    else if (input.type === 'up') controllerUp(Number(input.lane));
+    if (input.type === 'up') keyUp(input.lane);
+    else {
+      keyDown(input.lane);
+      if (input.type !== 'down') keyUp(input.lane);
+    }
   } catch (_) {}
 };
 
 const keys = { d: 0, f: 1, j: 2, k: 3 };
 addEventListener('keydown', e => {
+  if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;   // typing a player name must not play notes
   const key = e.key.toLowerCase();
   if (key in keys && !e.repeat) keyDown(keys[key]);
 });
@@ -1389,23 +1535,34 @@ canvas.addEventListener('lostpointercapture', releasePointer);
 
 difficultyOptions.forEach(option => {
   option.addEventListener('click', () => {
-    activeLaneCount = Number(option.dataset.lanes);
+    if (!isSongRun()) {
+      showFeedback('Song required', 'Load an audio file and matching guitar chart before starting.', 'miss');
+      return;
+    }
+    const nextStartingLanes = Number(option.dataset.lanes);
+    const changingDifficulty = difficultySelected && nextStartingLanes !== songStartingLanes;
+    if (!changingDifficulty && difficultySelected) {
+      difficultyModal.hidden = true;
+      showFeedback(`Song Level ${songLevel}`, `${activeLaneCount} lanes remain active.`, 'ready');
+      return;
+    }
+    songStartingLanes = nextStartingLanes;
     difficultySelected = true;
-    applyDifficulty();
+    setSongLevel(songLevel, changingDifficulty);
     difficultyModal.hidden = true;
-    resetGame();
-    const label = activeLaneCount === 2 ? 'Easy' : activeLaneCount === 3 ? 'Medium' : 'Hard';
+    const label = `Song Level ${songLevel}`;
     difficultyLabel.textContent = `${label} · ${activeLaneCount} lanes`;
-    showFeedback(`${label} mode`, `${activeLaneCount} lanes active · follow the notes to the line.`, 'ready');
+    showFeedback(
+      changingDifficulty ? 'Difficulty changed' : `${label} mode`,
+      changingDifficulty
+        ? `${activeLaneCount} lanes active. Press Play song to restart this run.`
+        : `${activeLaneCount} lanes active · follow the notes to the line.`,
+      'ready'
+    );
   });
 });
 
 function resetGame() {
-  clearInterval(countdownTimer);
-  countdownTimer = null;
-  paused = false;
-  hideOverlay();
-  applyRoundConfig(roundConfig());
   score = 0;
   combo = 0;
   maxCombo = 0;
@@ -1415,13 +1572,7 @@ function resetGame() {
   stats.good = 0;
   stats.miss = 0;
   stats.reactions.length = 0;
-  if (!chartLoaded) {
-    sourceNotes = createDefaultNotes(roundConfig());
-    if (difficultySelected) applyDifficulty();
-    else notes = sourceNotes;
-  } else if (difficultySelected) {
-    applyDifficulty();
-  }
+  resetRunTracking();
   notes.forEach((note, index) => {
     note.progress = 0;
     note.hitDiffs.length = 0;
@@ -1434,15 +1585,16 @@ function resetGame() {
   downAt.fill(null);
   hitEffects.length = 0;
   t0 = performance.now();
-  inputBlockedUntil = performance.now() + 150;
+  onRunReset();
   updateStats();
-  updateRoundUI();
 }
 
 function updateSongControls() {
   const ready = songMode && chartLoaded;
   songToggle.disabled = !ready;
   songToggle.textContent = ready ? 'Play song' : songMode ? 'Load guitar chart' : 'Choose song + guitar chart';
+  if (ready && !difficultySelected) difficultyModal.hidden = false;
+  refreshModeUI();
 }
 
 songFile.addEventListener('change', event => {
@@ -1456,6 +1608,12 @@ songFile.addEventListener('change', event => {
   songAudio.load();
   resetGame();
   songName.textContent = file.name;
+  ui.trackTitle.textContent = file.name;
+  if (chartLoaded) {
+    loadedSongKey = makeSongKey();
+    if (usingLevels()) setSongLevel(songProgress ? songProgress.current_level : 1, false);
+    loadSongProgress();
+  }
   updateSongControls();
   showFeedback(chartLoaded ? 'Song loaded' : 'Guitar chart required', chartLoaded ? 'Press play when you are ready for exact sync.' : 'Load the matching guitar chart JSON before playing.', chartLoaded ? 'ready' : 'miss');
 });
@@ -1474,7 +1632,15 @@ chartFile.addEventListener('change', async event => {
       songAudio.currentTime = 0;
     }
     resetGame();
+    loadedSongKey = makeSongKey();
+    songProgress = null;
+    songLevel = 1;
+    if (usingLevels()) {
+      setSongLevel(1, false);
+      loadSongProgress();
+    }
     chartName.textContent = `${file.name} · ${notes.length} ${isMidi ? 'MIDI-converted' : 'guitar'} events · ${data.bpm || chartBpm} BPM`;
+    if (!songMode) ui.trackTitle.textContent = loadedChartTitle || file.name;
     updateSongControls();
     showFeedback(songMode ? 'Guitar chart loaded' : 'Chart loaded', songMode ? 'The song and chart are ready to play together.' : 'Load the matching song audio to play this chart.', 'ready');
   } catch (error) {
@@ -1501,7 +1667,7 @@ songBpm.addEventListener('change', () => {
 });
 
 songToggle.addEventListener('click', async () => {
-  if (!songAudio.src || !chartLoaded || paused) return;
+  if (!songAudio.src || !chartLoaded) return;
   if (finished || songAudio.ended) {
     songAudio.currentTime = 0;
     resetGame();
@@ -1519,6 +1685,7 @@ songToggle.addEventListener('click', async () => {
   }
 });
 
+songAudio.addEventListener('play', () => { songStarted = true; });
 songAudio.addEventListener('pause', () => {
   if (songMode && !songAudio.ended && !finished) {
     songToggle.textContent = 'Resume song';
@@ -1531,6 +1698,7 @@ songAudio.addEventListener('ended', () => {
 });
 
 function finish() {
+  notes.forEach(n => { if (!n.done) missNote(n); });   // notes still pending when the song ends count as misses
   finished = true;
   if (songMode && !songAudio.paused) songAudio.pause();
   if (songMode) songToggle.textContent = 'Replay song';
@@ -1541,11 +1709,9 @@ function finish() {
     missRate: total ? stats.miss / total : 0,
     maxCombo, score, ...stats
   };
-  const outcome = evaluateRound();
-  Object.assign(result, { round: currentRound, passed: outcome.passed, aiTier: outcome.ai.label });
-  showFeedback(outcome.passed ? 'Round complete!' : 'Round not cleared', `Final score: ${score.toLocaleString()} points`, outcome.passed ? 'good' : 'miss');
-  showRoundResult(outcome);
+  showFeedback('Track complete!', `Final score: ${score.toLocaleString()} points`, 'good');
   fetch('/api/results', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(result) });
+  onRunFinished();   // Python AI evaluation + SQLite save
 }
 
 /*
@@ -1687,6 +1853,12 @@ function drawPerspectiveGame(now) {
     ctx.fill();
   }
 
+  if (!isSongRun()) {
+    drawHitEffects(performance.now());
+    requestAnimationFrame(loop);
+    return;
+  }
+
   for (const n of notes) {
     if (n.done) continue;
     const target = currentTarget(n);
@@ -1748,7 +1920,7 @@ function drawPerspectiveGame(now) {
       }
     } else {
       const x = laneCenterAt(n.lane, y);
-      const label = n.kind === 'hold' ? 'H' : '';
+      const label = n.kind === 'hold' ? 'H' : n.kind === 'double' || n.kind === 'triple' ? `x${n.count}` : '';
       drawGem(x, y, Math.max(9, (n.kind === 'hold' ? 13 : 14) * visualScale), colors[n.lane], label);
     }
   }
@@ -1756,7 +1928,6 @@ function drawPerspectiveGame(now) {
 */
 
 function loop() {
-  updateGameButtons();
   const now = gameTime();
   const currentLaneWidth = laneWidth();
   ctx.clearRect(0, 0, 400, 600);
@@ -1874,7 +2045,7 @@ function loop() {
     ctx.fillStyle = '#11100f';
     ctx.font = 'bold 9px Segoe UI, sans-serif';
     ctx.textAlign = 'center';
-    const label = n.kind === 'chord' ? (noteLanes(n).length === 4 ? 'ALL 4' : 'CHORD') : n.kind === 'hold' ? 'H' : '';
+    const label = n.kind === 'chord' ? (noteLanes(n).length === 4 ? 'ALL 4' : 'CHORD') : n.kind === 'hold' ? 'H' : n.kind === 'double' || n.kind === 'triple' ? `×${n.count}` : '';
     if (label) {
       const labelX = n.kind === 'chord'
         ? (Math.min(...noteLanes(n)) * currentLaneWidth + currentLaneWidth / 2 + Math.max(...noteLanes(n)) * currentLaneWidth + currentLaneWidth / 2) / 2
@@ -1884,251 +2055,877 @@ function loop() {
   }
 
   drawHitEffects(performance.now());
-  if (!finished && notes.every(n => n.done)) finish();
+  if (!finished && notes.length && notes.every(n => n.done)) finish();
   requestAnimationFrame(loop);
 }
+/* ======================================================================
+   Progression system - talks to the Python AI + SQLite backend (/api/game)
+   Everything below adds progression and saving to uploaded-song runs. The
+   browser still allows an uploaded song to play without the backend, but no
+   progress can be saved in that case.
+   ====================================================================== */
+const API_BASE = '/api/game';
+const PASS_PCT = 70;
+const byId = id => document.getElementById(id);
+const ui = {
+  playerChip: byId('player-chip'), playerName: byId('player-chip-name'), trackTitle: byId('track-title'),
+  levelNo: byId('level-no'), levelName: byId('level-name'), levelStatus: byId('level-status'),
+  compPct: byId('comp-pct'), compBar: byId('comp-bar'), compFill: byId('comp-fill'), compNote: byId('comp-note'),
+  chips: byId('level-chips'), offline: byId('offline-note'),
+  btnPause: byId('btn-pause'), btnRestart: byId('btn-restart'), btnRetry: byId('btn-retry'), btnNext: byId('btn-next'),
+  btnRecords: byId('btn-records'), btnLeaderboard: byId('btn-leaderboard'),
+  btnDifficulty: byId('btn-difficulty'), btnBack: byId('btn-back-levels'),
+  coachTitle: byId('coach-title'), coachText: byId('coach-text'), coachList: byId('coach-list'), breakdown: byId('coach-breakdown'),
+  pauseOverlay: byId('pause-overlay'), resultOverlay: byId('result-overlay'), resultCard: byId('result-card'),
+  resultKicker: byId('result-kicker'), resultTitle: byId('result-title'), resultPct: byId('result-pct'),
+  resultSub: byId('result-sub'), resultBadge: byId('result-badge'), resultSave: byId('result-save'),
+  resultRetry: byId('result-retry'), resultNext: byId('result-next'), resultSaveAgain: byId('result-save-again'),
+  profileModal: byId('profile-modal'), profileCopy: byId('profile-copy'), profileList: byId('profile-list'),
+  profileTermsCheck: byId('profile-terms-check'),
+  profileForm: byId('profile-form'), profileName: byId('profile-name'), profileError: byId('profile-error'),
+  profileActions: byId('profile-actions'), profileRetry: byId('profile-retry'), profileOffline: byId('profile-offline-play'),
+  profileCancel: byId('profile-cancel'),
+  recordsModal: byId('records-modal'), recordsTitle: byId('records-title'), recordsStats: byId('records-stats'),
+  recordsLevels: byId('records-levels'), recordsHistory: byId('records-history'), recordsClose: byId('records-close'),
+  leaderboardModal: byId('leaderboard-modal'), leaderboardTable: byId('leaderboard-table'),
+  leaderboardClose: byId('leaderboard-close'), btnDatabase: byId('btn-database'),
+  databaseModal: byId('database-modal'), databaseTabs: byId('database-tabs'), databaseStatus: byId('database-status'),
+  databaseTable: byId('database-table'), databaseClose: byId('database-close'),
+  difficultyCancel: byId('difficulty-cancel')
+};
 
-// ===== Pause, restart, round flow, AI coach =====
-const pauseBtn = document.getElementById('pause-btn');
-const restartBtn = document.getElementById('restart-btn');
-const roundSelect = document.getElementById('round-select');
-const overlay = document.getElementById('round-overlay');
-const overlayCard = document.getElementById('overlay-card');
-const reqList = document.getElementById('req-list');
-const DIFF_NAMES = { 2: 'Easy', 3: 'Medium', 4: 'Hard' };
-let pausedAudio = false;
+const PG = {
+  online: false,            // Python backend reachable and database usable
+  offlineReason: '',
+  levels: [], player: null, progress: {},   // progress[level] = level_progress row
+  lastResult: null, pending: null, runToken: 0,
+  liveDirty: false, liveBusy: false, liveTimer: null, liveSeq: 0, lastLiveAt: 0
+};
+const runTrack = { early: 0, late: 0, offsetSum: 0, offsetCount: 0, missKinds: {}, missLanes: [0, 0, 0, 0] };
 
-function canPause() {
-  return difficultySelected && !finished && !paused && (!(songMode && chartLoaded) || !songAudio.paused);
+function usingLevels() { return PG.online && !!PG.player && PG.levels.length > 0; }
+function isSongRun() { return songMode && chartLoaded; }
+function levelInfo(n) { return PG.levels.find(l => l.level === n) || PG.levels[0]; }
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+function makeSongKey() {
+  const audioName = songFile.files[0] ? songFile.files[0].name : 'no-audio';
+  const chartNameValue = chartFile.files[0] ? chartFile.files[0].name : 'chart';
+  return `${audioName} :: ${chartNameValue} :: ${loadedChartTitle || 'Untitled chart'}`;
 }
-function updateGameButtons() {
-  pauseBtn.disabled = !canPause();
-  restartBtn.disabled = !difficultySelected;
-}
-function showOverlay(html) { overlayCard.innerHTML = html; overlay.hidden = false; }
-function hideOverlay() { overlay.hidden = true; overlayCard.innerHTML = ''; }
 
-function pauseGame() {
-  if (!canPause()) return;
-  frozenTime = gameTime();           // capture before flipping the flag
-  pauseStartedAt = performance.now();
-  paused = true;
-  pausedAudio = songMode && chartLoaded && !songAudio.paused;
-  if (pausedAudio) songAudio.pause();
-  showOverlay(`<p class="ov-kicker">Round ${currentRound} · ${DIFF_NAMES[activeLaneCount]}</p>
-    <h2 class="ov-title">Paused</h2>
-    <p class="ov-copy">Song, notes, timer and score are stopped. Controller and keyboard hits are ignored until you resume.</p>
-    <div class="ov-actions">
-      <button class="game-btn ov-btn-main" data-action="resume" type="button">Resume</button>
-      <button class="game-btn" data-action="restart" type="button">Restart</button>
-    </div>`);
+async function loadSongProgress() {
+  if (!usingLevels() || !chartLoaded || !loadedSongKey) return;
+  const request = ++songProgressRequest;
+  const key = loadedSongKey;
+  try {
+    const query = `?key=${encodeURIComponent(key)}&title=${encodeURIComponent(loadedChartTitle || 'Custom song')}`;
+    const reply = await pgApi(`/players/${PG.player.player_id}/song-progress${query}`);
+    if (request !== songProgressRequest || key !== loadedSongKey) return;
+    songProgress = reply.progress;
+    setSongLevel(songProgress.current_level, false);
+    refreshModeUI();
+  } catch (_) {
+    // Uploaded songs can still be played at the first adaptive level if the
+    // progress lookup is temporarily unavailable.
+  }
 }
 
-function resumeGame() {
-  if (!paused || countdownTimer) return;
-  let n = 3;
-  const draw = () => showOverlay(`<div class="ov-count">${n}</div><p class="ov-copy">Get ready. The round continues exactly where it stopped.</p>`);
-  draw();
-  countdownTimer = setInterval(() => {
-    n--;
-    if (n > 0) { draw(); return; }
-    clearInterval(countdownTimer);
-    countdownTimer = null;
-    continueGame();
-  }, 500);
+async function pgApi(path, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), options.timeout || 4000);
+  try {
+    const res = await fetch(API_BASE + path, {
+      method: options.method || 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+      signal: controller.signal
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok === false) {
+      const error = new Error(data.message || `Server error (${res.status})`);
+      error.status = res.status;
+      error.code = data.error;
+      throw error;
+    }
+    return data;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
-function continueGame() {
-  t0 += performance.now() - pauseStartedAt;   // wall-clock mode picks up at the frozen time
+/* ---------- hooks called from the existing game code ---------- */
+function resetRunTracking() {
+  runTrack.early = 0; runTrack.late = 0; runTrack.offsetSum = 0; runTrack.offsetCount = 0;
+  runTrack.missKinds = {}; runTrack.missLanes = [0, 0, 0, 0];
   paused = false;
-  hideOverlay();
-  // A sustain the player let go of while paused can no longer be completed.
-  notes.forEach(n => { if (!n.done && n.kind === 'hold' && n.started && !held[n.lane]) missNote(n); });
-  showFeedback('Back in!', 'Keep the rhythm going.', 'ready');
-  if (pausedAudio) {
-    pausedAudio = false;
-    songAudio.play().then(() => { songToggle.textContent = 'Pause song'; })
-      .catch(() => showFeedback('Press Play song', 'The browser blocked audio. Press Play song to continue.', 'miss'));
+  songStarted = false;
+}
+
+function trackHit(signedSeconds) {          // positive = pressed after the beat
+  const ms = signedSeconds * 1000;
+  runTrack.offsetSum += ms;
+  runTrack.offsetCount++;
+  if (ms < -15) runTrack.early++;
+  else if (ms > 15) runTrack.late++;
+}
+
+function trackMiss(note) {
+  runTrack.missKinds[note.kind] = (runTrack.missKinds[note.kind] || 0) + 1;
+  if (note.kind !== 'chord') runTrack.missLanes[note.lane]++;
+}
+
+function buildRunStats() {
+  const kinds = {};
+  for (const n of notes) {
+    const entry = kinds[n.kind] || (kinds[n.kind] = { total: 0, done: 0, missed: 0 });
+    entry.total++;
+    if (n.done) entry.done++;
   }
-}
-
-function restartRound() {
-  resetGame();                       // score, streak, stats, notes, held keys, overlays, timers
-  if (songMode && chartLoaded) {
-    songAudio.pause();
-    songAudio.currentTime = 0;
-    songAudio.play().then(() => { songToggle.textContent = 'Pause song'; })
-      .catch(() => showFeedback('Press Play song', 'Press Play song to start this round.', 'ready'));
-  }
-  showFeedback(`Round ${currentRound}`, 'Fresh start: score, streak and accuracy were reset.', 'ready');
-}
-
-function nextRound() {
-  if (currentRound < MAX_ROUND && currentRound < progress.unlocked) currentRound++;
-  restartRound();
-}
-
-function roundRequirements(total = notes.length, round = currentRound) {
-  const step = Math.floor((round - 1) / 3);
+  for (const [kind, count] of Object.entries(runTrack.missKinds)) if (kinds[kind]) kinds[kind].missed = count;
   return {
-    accuracy: Math.min(90, REQUIRE.accuracy + step * 2),
-    hitRate: Math.min(85, REQUIRE.hitRate + step * 2),
-    score: Math.round(REQUIRE.score * clamp(total / 48, 0.25, 2.5) * (1 + 0.08 * (round - 1)) / 100) * 100
+    total_notes: notes.length, perfect: stats.perfect, good: stats.good, miss: stats.miss,
+    max_combo: maxCombo, combo, score, lanes: activeLaneCount, kinds,
+    miss_lanes: runTrack.missLanes.slice(), early: runTrack.early, late: runTrack.late,
+    offset_sum_ms: Math.round(runTrack.offsetSum), offset_count: runTrack.offsetCount
   };
 }
 
-function renderRequirements() {
-  const total = notes.length;
-  const completed = stats.perfect + stats.good + stats.miss;
-  const hits = stats.perfect + stats.good;
-  const req = roundRequirements(total);
-  const acc = completed ? Math.round(hits / completed * 100) : null;
-  const rate = total ? Math.round(hits / total * 100) : 0;
-  const rows = [
-    [`Accuracy ≥ ${req.accuracy}%`, acc === null ? '—' : `${acc}%`, acc === null ? '' : acc >= req.accuracy ? 'ok' : 'bad'],
-    [`Score ≥ ${req.score.toLocaleString()}`, score.toLocaleString(), score >= req.score ? 'ok' : ''],
-    [`Note hits ≥ ${req.hitRate}%`, `${rate}%`, rate >= req.hitRate ? 'ok' : '']
-  ];
-  reqList.innerHTML = rows.map(r => `<li class="${r[2]}"><span>${r[0]}</span><b>${r[1]}</b></li>`).join('');
+function onRunReset() {
+  PG.runToken++;
+  PG.liveSeq++;
+  PG.lastResult = null;
+  PG.pending = null;
+  PG.liveDirty = false;
+  clearTimeout(PG.liveTimer);
+  PG.liveTimer = null;
+  ui.resultOverlay.hidden = true;
+  setCompletion(0);
+  setLevelStatus(usingLevels() ? 'Ready' : '-');
+  ui.compNote.textContent = completionHint();
+  renderCoachIdle();
+  syncControls();
 }
 
-function renderAiBox() {
-  const ai = progress.lastAi;
-  document.getElementById('ai-tier').textContent = ai ? `AI coach · ${ai.tier}` : 'AI coach';
-  document.getElementById('ai-copy').textContent = ai ? ai.text : 'Finish a round and the coach will check your accuracy, reaction time and streaks, then tune the next round.';
+function completionHint() {
+  if (!isSongRun()) return 'Upload an audio file and matching guitar chart to start the game.';
+  if (!usingLevels()) return 'Song loaded. Progress saving is unavailable while the backend is offline.';
+  return songLevel >= SONG_LEVELS.length
+    ? `Reach ${PASS_PCT}% to clear the final song level.`
+    : `Reach ${PASS_PCT}% to unlock Song Level ${songLevel + 1}.`;
 }
 
-function updateRoundUI() {
-  roundSelect.innerHTML = '';
-  for (let i = 1; i <= progress.unlocked; i++) {
-    const option = document.createElement('option');
-    option.value = i;
-    option.textContent = i;
-    roundSelect.appendChild(option);
+function onStatsChanged() {
+  if (!usingLevels() || finished) return;
+  if (stats.perfect + stats.good + stats.miss === 0) return;
+  PG.liveDirty = true;
+  if (!PG.liveBusy && !PG.liveTimer) {
+    PG.liveTimer = setTimeout(liveTick, Math.max(0, 250 - (performance.now() - PG.lastLiveAt)));
   }
-  roundSelect.value = currentRound;
-  document.getElementById('round-max').textContent = MAX_ROUND;
-  document.getElementById('round-label').textContent = `Round ${currentRound} of ${MAX_ROUND}`;
-  document.getElementById('round-unlocked').textContent = `Unlocked ${progress.unlocked} / ${MAX_ROUND}`;
-  document.getElementById('round-dots').innerHTML = Array.from({ length: MAX_ROUND }, (_, i) =>
-    `<span class="${i + 1 <= progress.cleared ? 'done' : ''} ${i + 1 === currentRound ? 'cur' : ''}"></span>`).join('');
-  renderRequirements();
-  renderAiBox();
 }
 
-// ---- AI performance model (runs locally in the browser) ----
-function analyzePerformance(m) {
-  const acc = m.total ? m.hits / m.total : 0;
-  const perfectRate = m.hits ? m.perfect / m.hits : 0;
-  const comboRatio = m.total ? Math.min(1, m.maxCombo / m.total) : 0;
-  const timing = clamp(1 - (m.avgMs - 30) / 120, 0, 1);            // 30 ms avg error = great, 150 ms = poor
-  const missScore = 1 - clamp((m.misses / Math.max(1, m.total)) * 3, 0, 1);
-  const skill = Math.round(100 * (0.38 * acc + 0.2 * perfectRate + 0.17 * comboRatio + 0.15 * timing + 0.1 * missScore));
-  const rawLevel = skill >= 80 ? 1 : skill >= 58 ? 0 : -1;
-  const level = m.passed ? rawLevel : Math.min(rawLevel, 0);     // never get harder after a failed round
-  const label = level < 0 ? 'Beginner' : level > 0 ? 'Advanced' : 'Intermediate';
-
-  let opener;
-  if (level < 0) opener = `You missed ${m.misses} of ${m.total} notes, so the next round slows the notes by 12%, uses about 20% fewer of them and gives a wider timing window.`;
-  else if (level > 0) opener = `Strong control: ${Math.round(acc * 100)}% accuracy and a ${m.maxCombo}-note streak. Next round: 10% faster notes, denser and trickier patterns, tighter timing.`;
-  else opener = `Steady run at ${Math.round(acc * 100)}% accuracy. The next round keeps the normal difficulty curve.`;
-
-  const deficits = [
-    [0.55 - timing, `Your hits land about ${Math.round(m.avgMs)} ms away from the beat on average. Watch the strike line instead of the note.`],
-    [0.35 - comboRatio, `Your streak keeps breaking (best ${m.maxCombo}). Aim for clean hits first; speed comes after.`],
-    [0.4 - perfectRate, `Only ${Math.round(perfectRate * 100)}% of your hits were Perfect. Press right as the note touches the line.`]
-  ].sort((a, b) => b[0] - a[0]);
-  const tip = deficits[0][0] > 0 ? deficits[0][1] : 'Timing, streaks and precision are all solid. Keep it up!';
-  return { skill, level, label, text: `${opener} ${tip}` };
-}
-
-function evaluateRound() {
-  const total = notes.length;
-  const completed = stats.perfect + stats.good + stats.miss;
-  const hits = stats.perfect + stats.good;
-  const misses = stats.miss + Math.max(0, total - completed);      // unplayed notes count as misses
-  const accuracy = completed ? Math.round(hits / completed * 100) : 0;
-  const hitRate = total ? Math.round(hits / total * 100) : 0;
-  const req = roundRequirements(total);
-  const checks = [
-    { label: `Accuracy ≥ ${req.accuracy}%`, value: `${accuracy}%`, ok: accuracy >= req.accuracy },
-    { label: `Score ≥ ${req.score.toLocaleString()}`, value: score.toLocaleString(), ok: score >= req.score },
-    { label: `Note hits ≥ ${req.hitRate}%`, value: `${hitRate}%`, ok: hitRate >= req.hitRate }
-  ];
-  const passed = total > 0 && checks.every(c => c.ok);
-  const avgMs = stats.reactions.length ? stats.reactions.reduce((a, b) => a + b, 0) / stats.reactions.length * 1000 : 0;
-  const ai = analyzePerformance({ total, hits, perfect: stats.perfect, good: stats.good, misses, maxCombo, avgMs, passed });
-  return { passed, checks, accuracy, misses, ai, total, hits };
-}
-
-function showRoundResult(o) {
-  const prev = progress.best[currentRound] || { score: 0, accuracy: 0 };
-  progress.best[currentRound] = { score: Math.max(prev.score, score), accuracy: Math.max(prev.accuracy, o.accuracy) };
-  progress.plays++;
-  progress.aiLevel = o.ai.level;
-  progress.lastAi = { tier: o.ai.label, text: o.ai.text };
-  if (o.passed) {
-    progress.cleared = Math.max(progress.cleared, currentRound);
-    progress.unlocked = Math.min(MAX_ROUND, progress.cleared + 1);
+async function liveTick() {
+  PG.liveTimer = null;
+  if (!PG.liveDirty || PG.liveBusy || finished || !usingLevels()) return;
+  PG.liveDirty = false;
+  PG.liveBusy = true;
+  const seq = ++PG.liveSeq;
+  const token = PG.runToken;
+  try {
+    const reply = await pgApi('/evaluate', { method: 'POST', body: buildRunStats(), timeout: 2500 });
+    if (seq === PG.liveSeq && token === PG.runToken && !finished) applyLive(reply.evaluation);
+  } catch (_) {
+    /* a missed live update is harmless; the final result is evaluated separately */
+  } finally {
+    PG.liveBusy = false;
+    PG.lastLiveAt = performance.now();
+    if (PG.liveDirty && !PG.liveTimer) PG.liveTimer = setTimeout(liveTick, 250);
   }
-  saveProgress();
-  const clear = o.passed && currentRound >= MAX_ROUND;
-  const title = clear ? 'Campaign clear' : o.passed ? 'Round complete' : 'Round failed';
-  const copy = clear ? 'You cleared all 10 rounds!' : o.passed ? `Round ${currentRound + 1} unlocked.` : 'Meet every requirement below to unlock the next round.';
-  const rows = o.checks.map(c => `<li class="${c.ok ? 'ok' : 'bad'}"><span>${c.ok ? '✓' : '✗'} ${c.label}</span><b>${c.value}</b></li>`).join('');
-  const buttons = o.passed
-    ? (clear ? '' : '<button class="game-btn ov-btn-main" data-action="next" type="button">Next round</button>') +
-      `<button class="game-btn${clear ? ' ov-btn-main' : ''}" data-action="again" type="button">${clear ? 'Play again' : 'Replay'}</button>`
-    : '<button class="game-btn ov-btn-main" data-action="again" type="button">Try again</button>';
-  showOverlay(`<p class="ov-kicker">Round ${currentRound} of ${MAX_ROUND} · ${DIFF_NAMES[activeLaneCount]}</p>
-    <h2 class="ov-title ${o.passed ? 'win' : 'lose'}">${title}</h2>
-    <p class="ov-copy" style="margin-bottom:0">${copy}</p>
-    <div class="ov-stats">
-      <div><span>Score</span><strong>${score.toLocaleString()}</strong></div>
-      <div><span>Accuracy</span><strong>${o.accuracy}%</strong></div>
-      <div><span>Misses</span><strong>${o.misses}</strong></div>
-      <div><span>Perfect</span><strong>${stats.perfect}</strong></div>
-      <div><span>Good</span><strong>${stats.good}</strong></div>
-      <div><span>Max combo</span><strong>${maxCombo}</strong></div>
-    </div>
-    <ul class="ov-reqs">${rows}</ul>
-    <div class="ov-ai"><b>AI coach · ${o.ai.label} (skill ${o.ai.skill}/100)</b><span>${o.ai.text}</span></div>
-    <div class="ov-actions">${buttons}</div>`);
-  updateRoundUI();
 }
 
-pauseBtn.addEventListener('click', e => { e.currentTarget.blur(); pauseGame(); });
-restartBtn.addEventListener('click', e => { e.currentTarget.blur(); if (difficultySelected) restartRound(); });
-roundSelect.addEventListener('change', () => {
-  currentRound = clamp(Number(roundSelect.value) || 1, 1, progress.unlocked);
-  roundSelect.blur();
-  restartRound();
-});
-document.getElementById('reset-progress').addEventListener('click', () => {
-  if (!confirm('Reset all saved rounds and progress?')) return;
-  Object.assign(progress, { cleared: 0, unlocked: 1, best: {}, aiLevel: 0, plays: 0, lastAi: null });
-  saveProgress();
-  currentRound = 1;
-  restartRound();
-});
-overlay.addEventListener('click', e => {
-  const button = e.target.closest('[data-action]');
-  if (!button) return;
-  const action = button.dataset.action;
-  if (action === 'resume') resumeGame();
-  else if (action === 'restart' || action === 'again') restartRound();
-  else if (action === 'next') nextRound();
-});
-addEventListener('keydown', e => {
-  if (e.repeat || /^(INPUT|SELECT|TEXTAREA)$/.test((e.target && e.target.tagName) || '')) return;
-  const key = e.key.toLowerCase();
-  if (key === 'p' || key === 'escape') {
-    if (paused) resumeGame();
-    else pauseGame();
+function applyLive(ev) {
+  setCompletion(ev.completion);
+  const passing = ev.completion >= PASS_PCT;
+  setLevelStatus(passing ? 'Passing' : 'In progress', passing ? 'PASSED' : '');
+  if (!ev.can_still_pass) {
+    ui.compNote.textContent = `This run can't reach ${PASS_PCT}% any more (best possible ${ev.best_possible.toFixed(1)}%). Restart to try again.`;
+  } else if (ev.perfect_hits_needed === 0) {
+    ui.compNote.textContent = 'Above the pass line - keep it clean to lock it in.';
+  } else if (ev.perfect_hits_needed) {
+    ui.compNote.textContent = `About ${ev.perfect_hits_needed} more perfect hit${ev.perfect_hits_needed === 1 ? '' : 's'} to reach ${PASS_PCT}%.`;
   }
+  ui.coachTitle.textContent = ev.tip.title;
+  ui.coachText.textContent = ev.tip.text;
+  ui.coachList.replaceChildren();
+  renderBreakdown(ev.breakdown);
+}
+
+/* ---------- pause / restart ---------- */
+function isPaused() {
+  return isSongRun() ? (songStarted && songAudio.paused && !songAudio.ended && !finished) : paused;
+}
+function runActive() {
+  return difficultySelected && isSongRun() && !finished && songStarted;
+}
+function pauseGame() {
+  if (!runActive() || isPaused()) return;
+  if (isSongRun()) {
+    songAudio.pause();
+  } else {
+    paused = true;
+    pauseStartedAt = performance.now();
+    pausedClock = (pauseStartedAt - t0) / 1000;
+    showFeedback('Paused', 'Press Resume when you are ready.', 'ready');
+  }
+  syncControls();
+}
+function resumeGame() {
+  if (!isPaused()) return;
+  if (isSongRun()) {
+    songAudio.play().then(() => {
+      songToggle.textContent = 'Pause song';
+      showFeedback('Song playing', 'Exact guitar chart sync · follow the notes to the line.', 'ready');
+      syncControls();
+    }).catch(() => showFeedback('Could not resume', 'Press Resume song under the playfield.', 'miss'));
+    return;
+  }
+  t0 += performance.now() - pauseStartedAt;   // the clock did not advance while paused
+  paused = false;
+  // a hold whose key was let go during the pause cannot be completed any more
+  notes.filter(n => !n.done && n.kind === 'hold' && n.started && !held[n.lane]).forEach(missNote);
+  showFeedback('Back in', 'Follow the notes to the line.', 'ready');
+  syncControls();
+}
+function restartRun() {
+  if (!isSongRun()) {
+    showFeedback('Song required', 'Load an audio file and matching guitar chart before starting.', 'miss');
+    return;
+  }
+  songAudio.pause();
+  songAudio.currentTime = 0;
+  resetGame();
+  showFeedback('Restarted', 'Press Play song when you are ready.', 'ready');
+}
+function goNextLevel() {
+  const res = PG.lastResult;
+  if (res && res.mode === 'free' && res.next_song_level) {
+    setSongLevel(res.next_song_level);
+    showFeedback(`Song Level ${songLevel}`, `${songLevelInfo(songLevel).name} · the AI raised the challenge.`, 'ready');
+    return;
+  }
+}
+function exitFreePlay() {
+  songAudio.pause();
+  songAudio.removeAttribute('src');
+  songAudio.load();
+  if (songObjectUrl) { URL.revokeObjectURL(songObjectUrl); songObjectUrl = null; }
+  songMode = false;
+  chartLoaded = false;
+  loadedChartTitle = '';
+  loadedSongKey = '';
+  songLevel = 1;
+  songProgress = null;
+  songProgressRequest++;
+  songFile.value = '';
+  chartFile.value = '';
+  songName.textContent = 'No song loaded';
+  ui.trackTitle.textContent = 'Upload a song + chart';
+  chartName.textContent = 'No guitar chart loaded · exact sync is required';
+  songBpm.disabled = false;
+  restoreDefaultTiming();
+  sourceNotes = [];
+  notes = sourceNotes;
+  difficultySelected = false;
+  songStartingLanes = 2;
+  difficultyLabel.textContent = 'Choose at start';
+  difficultyModal.hidden = true;
+  resetGame();
+  updateSongControls();
+  showFeedback('Song unloaded', 'Load an audio file and matching guitar chart to play.', 'ready');
+}
+
+/* ---------- panel rendering ---------- */
+function setCompletion(pct) {
+  ui.compPct.textContent = `${pct.toFixed(1)}%`;
+  ui.compFill.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+  ui.compBar.setAttribute('aria-valuenow', pct.toFixed(1));
+  ui.compBar.dataset.pass = pct >= PASS_PCT ? 'true' : 'false';
+}
+function setLevelStatus(text, state = '') {
+  ui.levelStatus.textContent = text;
+  ui.levelStatus.dataset.state = state;
+}
+function refreshModeUI() {
+  const free = songMode || chartLoaded;
+  ui.btnBack.hidden = !isSongRun();
+  if (isSongRun()) {
+    const songLevelData = songLevelInfo(songLevel);
+    ui.levelNo.textContent = `Song Level ${songLevel}`;
+    ui.levelName.textContent = `${loadedChartTitle || 'Uploaded song'} · ${songLevelData.name}`;
+  } else {
+    ui.levelNo.textContent = 'Song required';
+    ui.levelName.textContent = free ? 'Load both audio and chart to play' : 'Upload an audio file and matching guitar chart';
+  }
+  ui.offline.hidden = PG.online || !PG.offlineReason;
+  ui.offline.textContent = PG.offlineReason;
+  ui.playerName.textContent = PG.player ? PG.player.name : (PG.online ? 'Choose player' : 'Offline');
+  ui.compNote.textContent = completionHint();
+  renderChips();
+  syncControls();
+}
+function renderChips() {
+  ui.chips.replaceChildren();
+  if (!usingLevels()) return;
+  if (isSongRun()) {
+    const unlockedThrough = songProgress ? songProgress.current_level : 1;
+    for (const level of SONG_LEVELS) {
+      const unlocked = level.level <= unlockedThrough;
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip';
+      chip.dataset.state = !unlocked ? 'locked' : level.level < unlockedThrough ? 'done' : 'open';
+      if (unlocked && level.level === songLevel) chip.dataset.current = 'true';
+      chip.textContent = !unlocked ? '🔒' : String(level.level);
+      chip.title = `Song Level ${level.level} · ${level.name} · ${songLevelLanes(level.level)} lanes` + (!unlocked ? ' (locked)' : '');
+      chip.disabled = !unlocked;
+      chip.addEventListener('click', () => {
+        setSongLevel(level.level);
+        chip.blur();
+      });
+      ui.chips.appendChild(chip);
+    }
+    return;
+  }
+}
+function syncControls() {
+  const pausedNow = isPaused();
+  ui.btnPause.textContent = pausedNow ? 'Resume' : 'Pause';
+  ui.btnPause.disabled = !runActive();
+  ui.pauseOverlay.hidden = !pausedNow;
+  ui.btnRestart.disabled = !isSongRun();
+  ui.btnRetry.disabled = !finished;
+  ui.resultRetry.disabled = !finished;
+
+  const res = PG.lastResult;
+  const songUnlocked = !!(res && res.mode === 'free' && res.next_song_level);
+  const levelUnlocked = !!(res && res.mode === 'level' && res.evaluation.unlocks_next && res.next_level);
+  const unlocked = songUnlocked || levelUnlocked;
+  const label = songUnlocked
+    ? 'Next song level ▶'
+    : levelUnlocked ? 'Next level ▶' : res && res.song_progress && res.evaluation.passed ? '🏆 Song complete' : res && res.is_final_level ? '🏆 All levels cleared' : '🔒 Next level';
+  for (const button of [ui.btnNext, ui.resultNext]) {
+    button.textContent = label;
+    button.disabled = !unlocked;
+    button.classList.toggle('unlocked', unlocked);
+  }
+}
+function refreshPlayerUI() {
+  ui.playerName.textContent = PG.player ? PG.player.name : 'Choose player';
+  renderChips();
+}
+function renderBreakdown(rows) {
+  ui.breakdown.replaceChildren();
+  ui.breakdown.hidden = !rows || !rows.length;
+  for (const row of rows || []) {
+    const line = document.createElement('div');
+    line.className = 'breakdown-row';
+    const name = document.createElement('span');
+    name.textContent = row.label;
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    const fill = document.createElement('i');
+    fill.style.width = `${Math.round(row.ratio * 100)}%`;
+    bar.appendChild(fill);
+    const points = document.createElement('b');
+    points.textContent = `${row.points.toFixed(1)}/${row.max}`;
+    line.append(name, bar, points);
+    ui.breakdown.appendChild(line);
+  }
+}
+function renderCoachIdle() {
+  ui.coachList.replaceChildren();
+  ui.breakdown.replaceChildren();
+  ui.breakdown.hidden = true;
+  if (usingLevels()) {
+    ui.coachTitle.textContent = 'Ready when you are';
+    ui.coachText.textContent = 'I track your hits, timing and streak, and coach you live while you play.';
+  } else {
+    ui.coachTitle.textContent = PG.online ? 'Pick a player' : 'AI coach is offline';
+    ui.coachText.textContent = PG.online
+      ? 'Choose a player profile to turn on the AI coach, then load a song.'
+      : 'Load a song and matching chart. Start the Python backend (npm start) to enable AI feedback and saving.';
+  }
+}
+function renderCoachFinal(reply) {
+  const feedback = reply.feedback;
+  ui.coachTitle.textContent = `${feedback.headline} · grade ${reply.evaluation.grade}`;
+  ui.coachText.textContent = feedback.summary;
+  ui.coachList.replaceChildren();
+  for (const text of feedback.strengths) {
+    const item = document.createElement('li');
+    item.className = 'good';
+    const title = document.createElement('strong');
+    title.textContent = 'What went well';
+    item.append(title, document.createTextNode(text));
+    ui.coachList.appendChild(item);
+  }
+  for (const tip of feedback.tips) {
+    const item = document.createElement('li');
+    const title = document.createElement('strong');
+    title.textContent = tip.title;
+    item.append(title, document.createTextNode(tip.text));
+    ui.coachList.appendChild(item);
+  }
+  renderBreakdown(reply.evaluation.breakdown);
+}
+
+/* ---------- finishing a run: evaluate with Python, save to SQLite ---------- */
+async function onRunFinished() {
+  if (!usingLevels()) return;
+  const free = isSongRun();
+  PG.pending = {
+    player_id: PG.player.player_id,
+    level: 0,
+    mode: free ? 'free' : 'level',
+    song_key: free ? loadedSongKey : '',
+    song_level: free ? songLevel : 0,
+    song_title: songMode && songFile.files.length
+      ? songFile.files[0].name.replace(/\.[^.]+$/, '')
+      : loadedChartTitle || 'Custom song',
+    difficulty_lanes: activeLaneCount,
+    stats: buildRunStats()
+  };
+  await pgSubmit();
+}
+async function pgSubmit() {
+  if (!PG.pending) return;
+  const token = PG.runToken;
+  ui.resultSaveAgain.hidden = true;
+  let reply = null;
+  let failure = null;
+  for (let attempt = 0; attempt < 2 && !reply; attempt++) {
+    try {
+      reply = await pgApi('/attempts', { method: 'POST', body: PG.pending, timeout: 6000 });
+    } catch (error) {
+      failure = error;
+      if (error.status && error.status < 500) break;     // a definite answer, retrying will not help
+      await sleep(1200);
+    }
+  }
+  if (token !== PG.runToken) {                            // player already restarted; keep their data fresh
+    if (reply && reply.player) { PG.player = reply.player; PG.progress = indexProgress(reply.player); refreshPlayerUI(); }
+    return;
+  }
+  if (!reply) return showResultError(failure);
+  PG.pending = null;
+  applyResult(reply);
+}
+function indexProgress(player) {
+  const map = {};
+  (player.levels || []).forEach(row => { map[row.level] = row; });
+  return map;
+}
+function applyLocalProgress(reply) {           // used when the database could not save the attempt
+  if (reply.mode !== 'level' || !PG.player) return;
+  const ev = reply.evaluation;
+  const row = PG.progress[reply.level] || (PG.progress[reply.level] =
+    { level: reply.level, attempts: 0, best_completion: 0, best_score: 0, completed: false, perfect: false });
+  row.attempts++;
+  row.best_completion = Math.max(row.best_completion, ev.completion);
+  row.best_score = Math.max(row.best_score, score);
+  row.completed = row.completed || ev.passed;
+  row.perfect = row.perfect || ev.perfect;
+  if (reply.next_level && reply.next_level > PG.player.current_level) PG.player.current_level = reply.next_level;
+}
+function applyResult(reply) {
+  if (reply.player) { PG.player = reply.player; PG.progress = indexProgress(reply.player); }
+  else applyLocalProgress(reply);
+  const songRun = reply.mode === 'free' && isSongRun();
+  if (songRun && reply.song_progress) songProgress = reply.song_progress;
+  refreshPlayerUI();
+  PG.lastResult = reply;
+
+  const ev = reply.evaluation;
+  const free = reply.mode === 'free';
+  setCompletion(ev.completion);
+  setLevelStatus({ FAILED: 'Failed', PASSED: 'Passed', PERFECT: 'Perfect' }[ev.status], ev.status);
+  ui.compNote.textContent = songRun
+    ? (reply.next_song_level ? `Song Level ${reply.next_song_level} unlocked!` : ev.passed ? 'Final song level cleared!' : `Below ${PASS_PCT}% - repeat this song level to improve.`)
+    : free
+    ? 'Free play result recorded.'
+    : ev.unlocks_next
+      ? (reply.next_level ? `Level ${reply.next_level} unlocked!` : 'Final level cleared!')
+      : `Below ${PASS_PCT}% - the next level stays locked. Retry to improve.`;
+
+  ui.resultCard.dataset.state = ev.status;
+  ui.resultKicker.textContent = songRun ? `Song Level ${reply.song_level} · ${songLevelInfo(reply.song_level).name}` : free ? 'Free play' : `Level ${reply.level} · ${levelInfo(reply.level).name}`;
+  ui.resultTitle.textContent = free
+    ? (songRun
+      ? { FAILED: 'Repeat song level', PASSED: 'Song level passed', PERFECT: 'Perfect song level' }[ev.status]
+      : { FAILED: 'Below 70%', PASSED: 'Nice run', PERFECT: 'Perfect!' }[ev.status])
+    : { FAILED: 'Level failed', PASSED: 'Level passed', PERFECT: 'Perfect completion' }[ev.status];
+  ui.resultPct.textContent = `${ev.completion.toFixed(1)}%`;
+  ui.resultSub.textContent = songRun
+    ? (reply.next_song_level ? `Song Level ${reply.next_song_level} is unlocked. The AI increased the challenge.` : ev.passed ? 'You cleared the final adaptive song level.' : `You need ${PASS_PCT}% to advance. Retry this song level when ready.`)
+    : free
+    ? 'Free play is saved to your history.'
+    : ev.unlocks_next
+      ? (reply.next_level ? `Level ${reply.next_level} (${levelInfo(reply.next_level).name}) is unlocked.` : 'You cleared the final level!')
+      : `You need ${PASS_PCT}% to unlock the next level. Retry when you are ready.`;
+  const badges = [];
+  if (ev.perfect) badges.push('★ Perfect score recorded');
+  if (reply.new_high_score) badges.push('New high score');
+  ui.resultBadge.textContent = badges.join(' · ');
+  ui.resultBadge.hidden = !badges.length;
+  ui.resultSave.textContent = reply.saved ? 'Attempt saved to your records.' : `${reply.save_error || 'Not saved.'} Your progress this session still counts.`;
+  ui.resultSave.dataset.kind = reply.saved ? '' : 'warn';
+  ui.resultOverlay.hidden = false;
+
+  renderCoachFinal(reply);
+  syncControls();
+}
+function showResultError(error) {
+  const message = error && error.status && error.status < 500 ? error.message : 'Could not reach the Python backend.';
+  ui.resultCard.dataset.state = 'FAILED';
+  ui.resultKicker.textContent = 'Result not evaluated';
+  ui.resultTitle.textContent = 'Connection problem';
+  ui.resultPct.textContent = '-';
+  ui.resultSub.textContent = message;
+  ui.resultBadge.hidden = true;
+  ui.resultSave.textContent = 'Press Try again to resend this run, or Retry to play it again.';
+  ui.resultSave.dataset.kind = 'warn';
+  ui.resultSaveAgain.hidden = false;
+  ui.resultOverlay.hidden = false;
+  syncControls();
+}
+
+/* ---------- player profiles ---------- */
+let termsAccepted = false;
+function updateTermsControls() {
+  ui.profileName.disabled = !termsAccepted;
+  const submit = ui.profileForm.querySelector('button[type="submit"]');
+  if (submit) submit.disabled = !termsAccepted;
+  ui.profileList.querySelectorAll('button').forEach(button => { button.disabled = !termsAccepted; });
+}
+function setTermsAccepted(accepted) {
+  termsAccepted = Boolean(accepted);
+  ui.profileTermsCheck.checked = termsAccepted;
+  updateTermsControls();
+  if (termsAccepted) ui.profileName.focus();
+}
+function profileShow(mode, message) {              // mode: loading | ready | offline
+  ui.profileModal.hidden = false;
+  ui.profileCopy.textContent = message;
+  ui.profileForm.hidden = mode !== 'ready';
+  ui.profileActions.hidden = mode !== 'offline';
+  ui.profileCancel.hidden = !(PG.player && mode === 'ready');
+  ui.profileError.textContent = '';
+  if (mode !== 'ready') ui.profileList.replaceChildren();
+  updateTermsControls();
+}
+function renderProfileList(players) {
+  ui.profileList.replaceChildren();
+  players.forEach((player, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `profile-pick${index === 0 ? ' recent' : ''}`;
+    const name = document.createElement('strong');
+    name.textContent = (index === 0 ? 'Continue as ' : '') + player.name;
+    const meta = document.createElement('span');
+    meta.textContent = `Level ${player.current_level} · best ${player.highest_score.toLocaleString()}`;
+    button.append(name, meta);
+    button.addEventListener('click', () => choosePlayer(player.name));
+    ui.profileList.appendChild(button);
+  });
+  profileShow('ready', players.length
+    ? 'Pick your profile to continue from your last unlocked level, or create a new one.'
+    : 'Create a profile so your progress and records are saved.');
+  if (!players.length && termsAccepted) ui.profileName.focus();
+}
+function goOffline(reason) {
+  PG.online = false;
+  PG.offlineReason = reason;
+  profileShow('offline', `${reason} You can still play an uploaded song without saving.`);
+  refreshModeUI();
+}
+async function pgBoot() {
+  profileShow('loading', 'Connecting to the Python backend…');
+  let health = null;
+  for (let i = 0; i < 8 && !health; i++) {
+    try { health = await pgApi('/health', { timeout: 1500 }); } catch (_) { await sleep(500); }
+  }
+  if (!health) return goOffline('The Python backend is not running, so levels and saving are unavailable.');
+  if (!health.db_ok) return goOffline('The player database could not be opened, so progress cannot be saved.');
+  try {
+    const [levelData, playerData] = await Promise.all([pgApi('/levels'), pgApi('/players')]);
+    PG.levels = levelData.levels;
+    PG.online = true;
+    PG.offlineReason = '';
+    refreshModeUI();
+    renderProfileList(playerData.players);
+  } catch (error) {
+    goOffline('The backend answered with an error (' + error.message + ').');
+  }
+}
+async function choosePlayer(name) {
+  if (!termsAccepted) {
+    ui.profileError.textContent = 'Please agree to the data-use agreement first.';
+    return;
+  }
+  ui.profileError.textContent = '';
+  try {
+    const reply = await pgApi('/players', { method: 'POST', body: { name } });
+    PG.player = reply.player;
+    PG.progress = indexProgress(reply.player);
+    ui.profileModal.hidden = true;
+    ui.profileName.value = '';
+    if (chartLoaded) loadSongProgress();
+    if (!isSongRun()) difficultySelected = false;
+    refreshModeUI();
+  } catch (error) {
+    ui.profileError.textContent = error.status ? error.message : 'Could not reach the backend. Try again.';
+  }
+}
+async function openProfileSwitcher() {
+  if (!PG.online) return pgBoot();
+  pauseGame();
+  try {
+    const data = await pgApi('/players');
+    renderProfileList(data.players);
+  } catch (_) {
+    profileShow('ready', 'Could not refresh the player list - you can still type a name.');
+  }
+}
+
+/* ---------- player records / history ---------- */
+function cell(row, text, className) {
+  const td = document.createElement('td');
+  td.textContent = text;
+  if (className) td.className = className;
+  row.appendChild(td);
+  return td;
+}
+function tag(status) {
+  const span = document.createElement('span');
+  span.className = `tag ${status}`;
+  span.textContent = status;
+  return span;
+}
+function fillTable(table, headers, rows, emptyText) {
+  table.replaceChildren();
+  const head = table.createTHead().insertRow();
+  headers.forEach(text => { const th = document.createElement('th'); th.textContent = text; head.appendChild(th); });
+  const body = table.createTBody();
+  if (!rows.length) {
+    const td = body.insertRow().insertCell();
+    td.colSpan = headers.length;
+    td.className = 'empty-row';
+    td.textContent = emptyText;
+    return;
+  }
+  rows.forEach(build => build(body.insertRow()));
+}
+async function openRecords() {
+  if (!usingLevels()) return;
+  pauseGame();
+  ui.recordsModal.hidden = false;
+  ui.recordsTitle.textContent = PG.player.name;
+  ui.recordsStats.replaceChildren();
+  try {
+    const [profile, history] = await Promise.all([
+      pgApi(`/players/${PG.player.player_id}`),
+      pgApi(`/players/${PG.player.player_id}/attempts?limit=200`)
+    ]);
+    PG.player = profile.player;
+    PG.progress = indexProgress(profile.player);
+    refreshPlayerUI();
+    const p = profile.player;
+    const facts = [
+      ['Player ID', `#${p.player_id}`], ['Current level', `${p.current_level}`],
+      ['Levels completed', `${p.levels_completed} / ${PG.levels.length}`],
+      ['Highest score', p.highest_score.toLocaleString()], ['Total attempts', `${p.total_attempts}`],
+      ['Last played', p.last_played_at ? new Date(p.last_played_at).toLocaleDateString() : '-']
+    ];
+    ui.recordsStats.replaceChildren(...facts.map(([label, value]) => {
+      const box = document.createElement('div');
+      box.className = 'mini-stat';
+      const span = document.createElement('span'); span.textContent = label;
+      const strong = document.createElement('strong'); strong.textContent = value;
+      box.append(span, strong);
+      return box;
+    }));
+    fillTable(ui.recordsLevels, ['Level', 'Name', 'Attempts', 'Best %', 'Best score', 'Status'],
+      PG.levels.map(level => row => {
+        const prog = PG.progress[level.level];
+        cell(row, String(level.level));
+        cell(row, level.name);
+        cell(row, prog ? String(prog.attempts) : '0');
+        cell(row, prog ? `${prog.best_completion.toFixed(1)}%` : '-');
+        cell(row, prog ? prog.best_score.toLocaleString() : '-');
+        cell(row, level.level > p.current_level ? '🔒 Locked' : prog && prog.perfect ? '★ Perfect' : prog && prog.completed ? '✓ Completed' : 'Unlocked');
+      }), '');
+    const lanesName = { 2: 'Easy', 3: 'Medium', 4: 'Hard' };
+    fillTable(ui.recordsHistory, ['Date & time', 'Song', 'Level', 'Difficulty', 'Attempt', 'Completion', 'Score', 'Result'],
+      history.attempts.map(a => row => {
+        cell(row, new Date(a.created_at).toLocaleString());
+        cell(row, a.song_title || 'Unknown track');
+        cell(row, a.song_level ? `Song ${a.song_level}` : a.mode === 'free' ? 'Free play' : String(a.level));
+        cell(row, lanesName[a.difficulty_lanes] || `${a.difficulty_lanes} lanes`);
+        cell(row, `#${a.attempt_number}`);
+        cell(row, `${a.completion_pct.toFixed(1)}%`);
+        cell(row, a.score.toLocaleString());
+        cell(row).appendChild(tag(a.status));
+      }), 'No attempts yet - finish a run and it will show up here.');
+  } catch (error) {
+    ui.recordsStats.textContent = 'Could not load your records: ' + error.message;
+  }
+}
+function closeRecords() { ui.recordsModal.hidden = true; }
+async function openLeaderboard() {
+  ui.leaderboardModal.hidden = false;
+  fillTable(ui.leaderboardTable, ['Rank', 'Player', 'Song', 'Score', 'Result', 'Date'],
+    [], 'Loading leaderboard…');
+  try {
+    const reply = await pgApi('/leaderboard?limit=200');
+    fillTable(ui.leaderboardTable, ['Rank', 'Player', 'Song', 'Score', 'Result', 'Date'],
+      reply.leaderboard.map((entry, index) => row => {
+        cell(row, `#${index + 1}`);
+        cell(row, entry.player_name);
+        cell(row, entry.song_title || 'Unknown track');
+        cell(row, entry.score.toLocaleString());
+        cell(row).appendChild(tag(entry.status));
+        cell(row, new Date(entry.created_at).toLocaleDateString());
+      }), 'No scores yet - finish a run to join the leaderboard.');
+  } catch (error) {
+    fillTable(ui.leaderboardTable, ['Leaderboard'], [], `Could not load leaderboard: ${error.message}`);
+  }
+}
+function closeLeaderboard() { ui.leaderboardModal.hidden = true; }
+let databaseTableNames = [];
+function databaseValue(value) {
+  if (value === null || value === undefined || value === '') return '-';
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+}
+function fillDatabaseTable(tableInfo) {
+  ui.databaseTable.replaceChildren();
+  const headers = tableInfo.columns || [];
+  const head = ui.databaseTable.createTHead().insertRow();
+  headers.forEach(name => { const th = document.createElement('th'); th.textContent = name; head.appendChild(th); });
+  const body = ui.databaseTable.createTBody();
+  const rows = tableInfo.rows || [];
+  if (!rows.length) {
+    const td = body.insertRow().insertCell();
+    td.colSpan = Math.max(1, headers.length);
+    td.className = 'empty-row';
+    td.textContent = 'No rows in this table yet.';
+    return;
+  }
+  rows.forEach(record => {
+    const row = body.insertRow();
+    headers.forEach(name => cell(row, databaseValue(record[name])));
+  });
+}
+async function loadDatabaseTable(name) {
+  for (const button of ui.databaseTabs.querySelectorAll('.database-tab')) {
+    button.dataset.current = button.dataset.table === name ? 'true' : 'false';
+  }
+  ui.databaseStatus.textContent = `Loading ${name}…`;
+  try {
+    const reply = await pgApi(`/database/tables/${encodeURIComponent(name)}?limit=200`);
+    const tableInfo = reply.table;
+    fillDatabaseTable(tableInfo);
+    ui.databaseStatus.textContent = `${tableInfo.name} · ${tableInfo.total} row${tableInfo.total === 1 ? '' : 's'} (showing ${tableInfo.rows.length})`;
+  } catch (error) {
+    fillTable(ui.databaseTable, ['Database tables'], [], `Could not load ${name}: ${error.message}`);
+    ui.databaseStatus.textContent = '';
+  }
+}
+async function openDatabase() {
+  if (!PG.online) {
+    showFeedback('Backend unavailable', 'Start the Python backend to view the local SQLite tables.', 'miss');
+    return;
+  }
+  pauseGame();
+  ui.databaseModal.hidden = false;
+  ui.databaseTabs.replaceChildren();
+  ui.databaseStatus.textContent = 'Loading table list…';
+  fillTable(ui.databaseTable, ['Backend tables'], [], 'Loading…');
+  try {
+    const reply = await pgApi('/database/tables');
+    databaseTableNames = reply.tables || [];
+    databaseTableNames.forEach(info => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'database-tab';
+      button.dataset.table = info.name;
+      button.textContent = `${info.name} (${info.row_count})`;
+      button.addEventListener('click', () => loadDatabaseTable(info.name));
+      ui.databaseTabs.appendChild(button);
+    });
+    if (databaseTableNames.length) await loadDatabaseTable(databaseTableNames[0].name);
+    else ui.databaseStatus.textContent = 'No application tables found.';
+  } catch (error) {
+    ui.databaseStatus.textContent = `Could not load database tables: ${error.message}`;
+    fillTable(ui.databaseTable, ['Backend tables'], [], 'The database tables could not be loaded.');
+  }
+}
+function closeDatabase() { ui.databaseModal.hidden = true; }
+
+/* ---------- wiring ---------- */
+ui.btnPause.addEventListener('click', () => { if (isPaused()) resumeGame(); else pauseGame(); ui.btnPause.blur(); });
+ui.btnRestart.addEventListener('click', () => { restartRun(); ui.btnRestart.blur(); });
+ui.btnRetry.addEventListener('click', () => { restartRun(); ui.btnRetry.blur(); });
+ui.resultRetry.addEventListener('click', () => { restartRun(); ui.resultRetry.blur(); });
+ui.btnNext.addEventListener('click', () => { goNextLevel(); ui.btnNext.blur(); });
+ui.resultNext.addEventListener('click', () => { goNextLevel(); ui.resultNext.blur(); });
+ui.resultSaveAgain.addEventListener('click', pgSubmit);
+ui.btnRecords.addEventListener('click', openRecords);
+ui.recordsClose.addEventListener('click', closeRecords);
+ui.btnLeaderboard.addEventListener('click', openLeaderboard);
+ui.leaderboardClose.addEventListener('click', closeLeaderboard);
+ui.btnDatabase.addEventListener('click', openDatabase);
+ui.databaseClose.addEventListener('click', closeDatabase);
+ui.btnBack.addEventListener('click', () => exitFreePlay());
+ui.btnDifficulty.addEventListener('click', () => {
+  if (!isSongRun()) {
+    showFeedback('Song required', 'Load an audio file and matching guitar chart before choosing a difficulty.', 'miss');
+    return;
+  }
+  pauseGame();
+  ui.difficultyCancel.hidden = !difficultySelected;
+  difficultyModal.hidden = false;
 });
+ui.difficultyCancel.addEventListener('click', () => { difficultyModal.hidden = true; });
+ui.profileTermsCheck.addEventListener('change', event => setTermsAccepted(event.currentTarget.checked));
+ui.playerChip.addEventListener('click', openProfileSwitcher);
+ui.profileCancel.addEventListener('click', () => { ui.profileModal.hidden = true; });
+ui.profileRetry.addEventListener('click', pgBoot);
+ui.profileOffline.addEventListener('click', () => { ui.profileModal.hidden = true; refreshModeUI(); });
+ui.profileForm.addEventListener('submit', event => {
+  event.preventDefault();
+  if (!termsAccepted) {
+    ui.profileError.textContent = 'Please agree to the data-use agreement first.';
+    return;
+  }
+  const name = ui.profileName.value.trim();
+  if (!name) { ui.profileError.textContent = 'Enter a player name.'; return; }
+  choosePlayer(name);
+});
+addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  if (!ui.recordsModal.hidden) closeRecords();
+  else if (!ui.leaderboardModal.hidden) closeLeaderboard();
+  else if (!ui.databaseModal.hidden) closeDatabase();
+  else if (!ui.profileModal.hidden && PG.player) ui.profileModal.hidden = true;
+  else if (!difficultyModal.hidden && difficultySelected) difficultyModal.hidden = true;
+});
+setInterval(syncControls, 300);
+refreshModeUI();
+renderCoachIdle();
+pgBoot();
+
 updateStats();
-updateRoundUI();
 loop();
 </script>
 </body>
